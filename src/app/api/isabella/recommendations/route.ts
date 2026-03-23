@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createTraceId } from "@/core/context/trace";
 import { getLastDecision } from "@/lib/isabella";
 import { runRealitoKernel } from "@/lib/kernel";

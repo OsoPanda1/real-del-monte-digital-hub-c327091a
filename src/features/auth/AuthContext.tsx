@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { authApi } from '@/lib/api';

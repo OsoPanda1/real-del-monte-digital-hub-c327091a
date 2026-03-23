@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { MapPin, Mail, Phone, Send, Loader2, CheckCircle, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";

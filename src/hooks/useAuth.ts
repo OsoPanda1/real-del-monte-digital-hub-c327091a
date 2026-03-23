@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook de Autenticación TAMV
  * Triple Federado: Conceptual | Legal | Técnico

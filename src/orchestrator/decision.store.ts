@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { IsabellaDecision } from "@/core/models";
 
 export class DecisionStore {

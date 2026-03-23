@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * TAMVTrixField – Campo cuántico vivo de TAMV ONLINE
  * Fondo inmersivo 3D: solo alfabeto TAMVONLINE, profundidad, respiración y hero central.

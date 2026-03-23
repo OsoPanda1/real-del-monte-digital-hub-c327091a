@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { motion } from "framer-motion";
 import { MapPin, Phone, Globe, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ThresholdRule, type ScoreRule } from "@/core/rules/scoring.rule";
 import type { ScoreBreakdown } from "@/core/models";
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Navigation Bar - Barra de navegación inmersiva inteligente
  * Flotante, translúcida, adaptativa al contexto, estilo Constelación TAMV

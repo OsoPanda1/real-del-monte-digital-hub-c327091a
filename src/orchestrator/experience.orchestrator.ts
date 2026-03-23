@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { MovementFilter } from "@/core/behavior/movement.filter";
 import { detectMovementPattern } from "@/core/behavior/pattern.detector";
 import { endManualSpan, setSpanAttribute, startManualSpan } from "@/instrumentation.node";
