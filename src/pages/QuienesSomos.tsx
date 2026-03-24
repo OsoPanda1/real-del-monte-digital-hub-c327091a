@@ -7,7 +7,7 @@
 import { motion } from "framer-motion";
 import NavBar from "@/components/Navbar";
 import { FooterSection } from "@/components/FooterSection";
-import RealitoOrb from "@/components/RealitoOrb";
+import { RealitoOrb } from "@/components/RealitoOrb";
 
 const QuienesSomos = () => (
   <div className="min-h-screen bg-background text-foreground selection:bg-primary/30">
