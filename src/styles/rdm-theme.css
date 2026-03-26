@@ -1,0 +1,102 @@
+/* RDM Digital - Theme Layer
+   Estética: Editorial, cálida, territorial
+   Paleta: Marfil cálido con acentos ámbar/terracota
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
+:root {
+  --rdm-amber: 24 72% 50%;
+  --rdm-blue: 212 36% 45%;
+  --rdm-green: 154 66% 36%;
+  --rdm-red: 0 76% 53%;
+  --rdm-purple: 270 40% 50%;
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+.rdm-theme {
+  --background: 48 38% 96%;
+  --foreground: 218 24% 18%;
+  --card: 48 25% 98%;
+  --card-foreground: 218 24% 18%;
+  --popover: 48 28% 98%;
+  --popover-foreground: 218 24% 18%;
+  --primary: 212 36% 45%;
+  --primary-foreground: 45 40% 98%;
+  --secondary: 210 22% 92%;
+  --secondary-foreground: 218 24% 24%;
+  --muted: 210 18% 90%;
+  --muted-foreground: 215 13% 42%;
+  --accent: 24 72% 50%;
+  --accent-foreground: 45 40% 98%;
+  --border: 220 11% 82%;
+  --input: 220 11% 84%;
+  --ring: 24 72% 50%;
+
+  background-color: hsl(48 38% 96%);
+  background-image:
+    radial-gradient(circle at 10% 10%, hsl(0 0% 100% / 0.6) 0%, transparent 34%),
+    radial-gradient(circle at 80% 20%, hsl(210 10% 83% / 0.35) 0%, transparent 45%),
+    linear-gradient(120deg, hsl(48 36% 95%) 0%, hsl(210 17% 92%) 48%, hsl(45 30% 96%) 100%);
+  background-attachment: fixed;
+  color: hsl(218 24% 18%);
+  font-family: var(--font-body);
+}
+
+.rdm-theme h1, .rdm-theme h2, .rdm-theme h3, .rdm-theme h4, .rdm-theme h5, .rdm-theme h6 {
+  font-family: var(--font-display);
+}
+
+.rdm-theme ::selection {
+  background: hsl(24 72% 50% / 0.25);
+}
+
+.rdm-glass {
+  background: hsl(0 0% 100% / 0.65);
+  backdrop-filter: blur(16px);
+  border: 1px solid hsl(0 0% 100% / 0.3);
+}
+
+.rdm-map-pin {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--pin-color, hsl(24 72% 50%));
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transition: transform 0.2s;
+}
+.rdm-map-pin:hover {
+  transform: scale(1.3);
+}
+
+.rdm-popup .leaflet-popup-content-wrapper {
+  background: hsl(48 25% 98%);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  border: 1px solid hsl(220 11% 82%);
+}
+
+.rdm-popup-card { padding: 4px; }
+.rdm-popup-kicker { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: hsl(215 13% 42%); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.rdm-popup-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.rdm-popup-title { font-family: var(--font-display); font-weight: 700; font-size: 14px; margin-bottom: 4px; color: hsl(218 24% 18%); }
+.rdm-popup-desc { font-size: 12px; color: hsl(215 13% 42%); line-height: 1.4; }
+.rdm-popup-meta { font-size: 10px; color: hsl(215 13% 42%); display: flex; gap: 12px; margin-top: 6px; }
+
+@keyframes rdm-fade-up { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes rdm-ken-burns { from { transform: scale(1); } to { transform: scale(1.08); } }
+.rdm-animate-fade-up { animation: rdm-fade-up 1s ease-out forwards; }
+.rdm-animate-ken-burns { animation: rdm-ken-burns 20s ease-in-out infinite alternate; }
+
+/* TAMV card styles */
+.tamv-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+}
+
+.tamv-gold-border {
+  border-color: hsl(var(--rdm-amber) / 0.3);
+}

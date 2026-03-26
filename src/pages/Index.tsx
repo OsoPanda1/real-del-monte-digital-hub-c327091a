@@ -1,176 +1,94 @@
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
-import HeroSection from "@/components/HeroSection";
-import SectionHeader from "@/components/SectionHeader";
-import PlaceCard from "@/components/PlaceCard";
-import BusinessCard from "@/components/BusinessCard";
-import PostCard from "@/components/PostCard";
-import EventCard from "@/components/EventCard";
-import RoutesSection from "@/components/RoutesSection";
-import VideoGallery from "@/components/VideoGallery";
-import ImageGallery from "@/components/ImageGallery";
-import LoadingSkeleton from "@/components/LoadingSkeleton";
+import { RDMLayout } from "@/components/rdm/RDMLayout";
+import { RDMHero } from "@/components/rdm/RDMHero";
+import { RDMExperienceGrid } from "@/components/rdm/RDMExperienceGrid";
+import { RDMInteractiveMap } from "@/components/rdm/RDMInteractiveMap";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { Pickaxe, BookOpen, Shield, Code, Users, MapPin } from "lucide-react";
 import SEOMeta from "@/components/SEOMeta";
-import { TextReveal, StaggerContainer, StaggerItem, GlowCard } from "@/components/VisualEffects";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import GradientSeparator from "@/components/GradientSeparator";
-import PageTransition from "@/components/PageTransition";
-import ExperienceHub from "@/components/ExperienceHub";
-import MapaView from "@/components/MapaView";
-
-import { usePlaces } from "@/features/places";
-import { useBusinesses } from "@/features/businesses";
-import { useCommunityPosts } from "@/lib/hooks";
-import { useEvents } from "@/features/events";
 
 const Index = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-
-  const { data: places = [], isLoading: loadingPlaces } = usePlaces();
-  const { data: businesses = [], isLoading: loadingBusinesses } = useBusinesses();
-  const { data: posts = [], isLoading: loadingPosts } = useCommunityPosts();
-  const { data: events = [], isLoading: loadingEvents } = useEvents();
-
   return (
-    <PageTransition>
+    <RDMLayout hideNav>
       <SEOMeta 
-        title="Inicio"
+        title="RDM Digital — Sistema Operativo Territorial"
         description="Descubre Real del Monte, Pueblo Mágico de Hidalgo. Guía turística digital con mapa interactivo, rutas, gastronomía y eventos culturales."
       />
-      <div ref={containerRef} className="min-h-screen bg-background overflow-x-hidden">
-        <Navbar />
-        <HeroSection />
+      <RDMHero />
+      <RDMExperienceGrid />
 
-        {/* Places */}
-        <section className="py-24 relative overflow-hidden">
-          <motion.div className="absolute inset-0 -z-10" style={{ y: backgroundY }}>
-            <div className="absolute inset-0 bg-cover bg-center opacity-5" />
-            <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
+      {/* History preview */}
+      <section className="py-20 px-6 md:px-16 lg:px-24">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+          <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+            <p className="text-sm tracking-[0.3em] uppercase text-[hsl(var(--rdm-amber))] mb-4" style={{ fontFamily: "var(--font-body)" }}>Memoria de Alta Fidelidad</p>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6" style={{ fontFamily: "var(--font-display)" }}>
+              500 años de <span className="text-[hsl(var(--rdm-amber))]">historia minera</span>
+            </h2>
+            <p className="text-[hsl(215_13%_42%)] leading-relaxed mb-6" style={{ fontFamily: "var(--font-body)" }}>
+              Real del Monte guarda la memoria de la migración cornish que trajo consigo técnicas mineras,
+              el futbol y los pastes. Un legado que vive en cada callejón empedrado y en cada bocado.
+            </p>
+            <Link to="/historia" className="inline-flex items-center gap-2 text-sm font-medium text-[hsl(var(--rdm-amber))] hover:underline" style={{ fontFamily: "var(--font-body)" }}>
+              <Pickaxe className="w-4 h-4" /> Explorar la historia completa
+            </Link>
           </motion.div>
-          <div className="container mx-auto px-4 md:px-8">
-            <TextReveal>
-              <SectionHeader title="Lugares Imperdibles" subtitle="Descubre los atractivos más emblemáticos de Real del Monte" linkTo="/lugares" />
-            </TextReveal>
-            {loadingPlaces ? (
-              <LoadingSkeleton variant="card" count={4} />
-            ) : (
-              <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {places.map((place: any, i: number) => (
-                  <StaggerItem key={place.id || place.name}>
-                    <GlowCard><PlaceCard {...place} index={i} /></GlowCard>
-                  </StaggerItem>
-                ))}
-              </StaggerContainer>
-            )}
+          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="rounded-2xl overflow-hidden h-[350px]" style={{ background: "linear-gradient(135deg, hsl(24 40% 25%), hsl(218 24% 15%))" }}>
+            <div className="w-full h-full flex items-center justify-center">
+              <Pickaxe className="w-24 h-24 text-[hsl(var(--rdm-amber)/0.3)]" />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <RDMInteractiveMap />
+
+      {/* RDM-TOS section */}
+      <section className="py-20 px-6 md:px-16 lg:px-24 border-t border-[hsl(220_11%_82%)]">
+        <div className="max-w-5xl mx-auto text-center">
+          <p className="text-sm tracking-[0.3em] uppercase text-[hsl(var(--rdm-amber))] mb-4" style={{ fontFamily: "var(--font-body)" }}>
+            RDM-TOS · Sistema Operativo Territorial
+          </p>
+          <h2 className="text-3xl md:text-5xl font-bold mb-6" style={{ fontFamily: "var(--font-display)" }}>
+            Soberanía tecnológica desde la <span className="text-[hsl(var(--rdm-amber))]">montaña</span>
+          </h2>
+          <p className="text-[hsl(215_13%_42%)] max-w-2xl mx-auto mb-12" style={{ fontFamily: "var(--font-body)" }}>
+            RDM Digital fusiona smart-city, gemelo digital 4D, comercio local, IA emocional y economía creativa
+            en una infraestructura soberana. Powered by TAMV Online.
+          </p>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {[
+              { icon: MapPin, title: "Gemelo Territorial", desc: "Mapa inteligente con datos vivos" },
+              { icon: Users, title: "Comunidad Soberana", desc: "Gobernanza digital participativa" },
+              { icon: Shield, title: "Seguridad TENOCHTITLAN", desc: "Ciberseguridad de grado militar" },
+              { icon: BookOpen, title: "Memoria Viva", desc: "Historia verificable y auditada" },
+              { icon: Code, title: "API Pública DM-X7", desc: "Integración abierta para aliados" },
+              { icon: Pickaxe, title: "Economía Creativa", desc: "RDM Sound System + Fénix 75/25" },
+            ].map((item) => (
+              <div key={item.title} className="rdm-glass rounded-xl p-5 text-left">
+                <item.icon className="w-6 h-6 text-[hsl(var(--rdm-amber))] mb-3" />
+                <h3 className="font-semibold text-sm mb-1" style={{ fontFamily: "var(--font-display)" }}>{item.title}</h3>
+                <p className="text-xs text-[hsl(215_13%_42%)]" style={{ fontFamily: "var(--font-body)" }}>{item.desc}</p>
+              </div>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <div className="container mx-auto px-4 md:px-8"><GradientSeparator /></div>
-        <RoutesSection />
-        <div className="container mx-auto px-4 md:px-8"><GradientSeparator /></div>
-
-        <section className="py-24">
-          <div className="container mx-auto px-4 md:px-8">
-            <ExperienceHub />
-          </div>
-        </section>
-
-        <div className="container mx-auto px-4 md:px-8"><GradientSeparator /></div>
-
-        <section className="py-24">
-          <div className="container mx-auto px-4 md:px-8">
-            <MapaView />
-          </div>
-        </section>
-
-        <div className="container mx-auto px-4 md:px-8"><GradientSeparator /></div>
-        <VideoGallery />
-        <div className="container mx-auto px-4 md:px-8"><GradientSeparator /></div>
-
-        {/* Businesses */}
-        <section className="py-24">
-          <div className="container mx-auto px-4 md:px-8">
-            <TextReveal>
-              <SectionHeader title="Directorio Local" subtitle="Negocios y servicios recomendados por la comunidad" linkTo="/directorio" />
-            </TextReveal>
-            {loadingBusinesses ? (
-              <LoadingSkeleton variant="card" count={2} />
-            ) : (
-              <StaggerContainer className="grid md:grid-cols-2 gap-6">
-                {businesses.map((biz: any, i: number) => (
-                  <StaggerItem key={biz.id || biz.name}>
-                    <GlowCard><BusinessCard {...biz} index={i} /></GlowCard>
-                  </StaggerItem>
-                ))}
-              </StaggerContainer>
-            )}
-          </div>
-        </section>
-
-        <div className="container mx-auto px-4 md:px-8"><GradientSeparator /></div>
-        <ImageGallery />
-        <div className="container mx-auto px-4 md:px-8"><GradientSeparator /></div>
-
-        {/* Events */}
-        <section className="py-24 bg-muted/30 relative overflow-hidden">
-          <div className="container mx-auto px-4 md:px-8 relative z-10">
-            <TextReveal>
-              <SectionHeader title="Próximos Eventos" subtitle="Festivales, ferias y temporadas especiales" linkTo="/eventos" />
-            </TextReveal>
-            {loadingEvents ? (
-              <LoadingSkeleton variant="event" count={3} />
-            ) : (
-              <StaggerContainer className="grid md:grid-cols-3 gap-6">
-                {events.map((event: any, i: number) => (
-                  <StaggerItem key={event.id || event.name}>
-                    <EventCard {...event} index={i} />
-                  </StaggerItem>
-                ))}
-              </StaggerContainer>
-            )}
-          </div>
-        </section>
-
-        {/* Community */}
-        <section className="py-24">
-          <div className="container mx-auto px-4 md:px-8">
-            <TextReveal>
-              <SectionHeader title="Muro de Recuerdos" subtitle="Experiencias compartidas por visitantes de Real del Monte" linkTo="/comunidad" />
-            </TextReveal>
-            {loadingPosts ? (
-              <LoadingSkeleton variant="card" count={3} />
-            ) : (
-              <StaggerContainer className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {posts.map((post: any, i: number) => (
-                  <StaggerItem key={post.id || post.userName}>
-                    <PostCard
-                      userName={post.userName}
-                      userAvatar={post.userAvatar || post.userName?.charAt(0) || '?'}
-                      content={post.content}
-                      image={post.imageUrl}
-                      placeName={post.placeName}
-                      likes={post.likes || 0}
-                      comments={post.comments || 0}
-                      timeAgo={post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente'}
-                      index={i}
-                    />
-                  </StaggerItem>
-                ))}
-              </StaggerContainer>
-            )}
-          </div>
-        </section>
-
-        <div className="container mx-auto px-4 md:px-8"><GradientSeparator /></div>
-        <Footer />
-      </div>
-    </PageTransition>
+      {/* CTA */}
+      <section className="py-20 px-6 text-center">
+        <h2 className="text-4xl md:text-6xl font-bold mb-6" style={{ fontFamily: "var(--font-display)" }}>
+          Tu aventura <span className="text-[hsl(var(--rdm-amber))]">comienza aquí</span>
+        </h2>
+        <p className="text-[hsl(215_13%_42%)] max-w-md mx-auto mb-8" style={{ fontFamily: "var(--font-body)" }}>
+          Real del Monte te espera con 500 años de historia, sabores únicos y la magia de la Sierra de Pachuca.
+        </p>
+        <Link to="/mapa" className="inline-flex items-center gap-3 bg-[hsl(var(--rdm-amber))] text-white px-10 py-4 rounded-full font-semibold text-sm hover:scale-105 transition-transform" style={{ fontFamily: "var(--font-body)" }}>
+          Explorar Ahora
+        </Link>
+      </section>
+    </RDMLayout>
   );
 };
 
