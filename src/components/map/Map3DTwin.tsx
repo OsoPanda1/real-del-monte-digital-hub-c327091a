@@ -180,7 +180,6 @@ export function Map3DTwin({ viewport, markers, onViewportChange }: Map3DTwinProp
           <Atmosphere />
           <FoggyTerrain points={markers} />
           <FogPlane />
-          <Environment preset="night" />
           <OrbitControls
             enablePan={false}
             maxDistance={16}
