@@ -167,22 +167,31 @@ export const VideoPlayer = ({ video, onClose }: { video: Video; onClose: () => v
         className="relative aspect-video w-full max-w-5xl overflow-hidden rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <video
-          ref={videoRef}
-          src={video.videoSrc}
-          poster={video.thumbnail}
-          autoPlay
-          playsInline
-          className="h-full w-full object-cover"
-          onTimeUpdate={(e) => {
-            const vid = e.target as HTMLVideoElement;
-            if (!Number.isFinite(vid.duration) || vid.duration <= 0) {
-              setProgress(0);
-              return;
-            }
-            setProgress((vid.currentTime / vid.duration) * 100);
-          }}
-        />
+        {video.videoSrc ? (
+          <video
+            ref={videoRef}
+            src={video.videoSrc}
+            poster={video.thumbnail}
+            autoPlay
+            playsInline
+            className="h-full w-full object-cover"
+            onTimeUpdate={(e) => {
+              const vid = e.target as HTMLVideoElement;
+              if (!Number.isFinite(vid.duration) || vid.duration <= 0) {
+                setProgress(0);
+                return;
+              }
+              setProgress((vid.currentTime / vid.duration) * 100);
+            }}
+          />
+        ) : (
+          <div className="h-full w-full flex items-center justify-center bg-black">
+            <img src={video.thumbnail} alt={video.title} className="h-full w-full object-cover opacity-60" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-white/70 text-sm">Video próximamente disponible</p>
+            </div>
+          </div>
+        )}
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent transition-opacity duration-300 opacity-100 md:opacity-0 md:hover:opacity-100">
           <button
