@@ -95,6 +95,14 @@ const Feed = lazy(() => import("./pages/Feed"));
 const Estacionamientos = lazy(() => import("./pages/Estacionamientos"));
 const PatrimonioCultural = lazy(() => import("./pages/PatrimonioCultural"));
 
+// ===== Atlas territorial chapters (integrado de real-del-monte-atlas) =====
+const AtlasCapitulos = lazy(() => import("./pages/AtlasCapitulos"));
+const AtlasMinas = lazy(() => import("./pages/AtlasMinas"));
+const AtlasPastes = lazy(() => import("./pages/AtlasPastes"));
+const AtlasCementerio = lazy(() => import("./pages/AtlasCementerio"));
+const AtlasCalles = lazy(() => import("./pages/AtlasCalles"));
+const AtlasLeyendas = lazy(() => import("./pages/AtlasLeyendas"));
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -206,6 +214,14 @@ const AnimatedRoutes = () => {
           {/* === New Tourism Routes === */}
           <Route path="/estacionamientos" element={<Estacionamientos />} />
           <Route path="/patrimonio-cultural" element={<PatrimonioCultural />} />
+
+          {/* === Atlas territorial (capítulos narrativos) === */}
+          <Route path="/capitulos" element={<AtlasCapitulos />} />
+          <Route path="/capitulos/minas" element={<AtlasMinas />} />
+          <Route path="/capitulos/pastes" element={<AtlasPastes />} />
+          <Route path="/capitulos/cementerio" element={<AtlasCementerio />} />
+          <Route path="/capitulos/calles" element={<AtlasCalles />} />
+          <Route path="/capitulos/leyendas" element={<AtlasLeyendas />} />
 
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />
