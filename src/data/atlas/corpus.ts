@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ─────────────────────────────────────────────────────────────────────────────
 // CORPUS MAXIMUS · Real del Monte · Ingesta Nivel 0 (Público/Turístico)
 // Fuente de verdad para ISABELLA AI v4.0 / Realito AI

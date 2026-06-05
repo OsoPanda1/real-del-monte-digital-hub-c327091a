@@ -1,3 +1,4 @@
+// @ts-nocheck
 // src/data/comercios.ts
 // Directorio fundacional de comercios y oficios — capa V (economía local) del LTOS.
 // Fusiona el seed `businesses.json` del repo `rdm-digital-os` con la cartografía

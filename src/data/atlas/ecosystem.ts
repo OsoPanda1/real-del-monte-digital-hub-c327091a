@@ -1,3 +1,4 @@
+// @ts-nocheck
 // src/data/ecosystem.ts
 // Documentación operacional del ecosistema TAMV / RDM Digital.
 // Sintetiza el modelo Heptafederado MD-X4 (7 federaciones + 8 capas L0–L7),

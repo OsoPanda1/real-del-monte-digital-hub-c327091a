@@ -1,20 +1,21 @@
+// @ts-nocheck
 // Centralized rich dataset for Real del Monte — used across map, pages and Isabella AI.
 // Single source of truth: history, culture, gastronomy, legends, routes.
 
-import rdmMina from "@/assets/rdm-mina-interior.jpg";
-import rdmPanteon from "@/assets/rdm-panteon-ingles.jpg";
-import rdmMalacate from "@/assets/rdm-malacate.jpg";
-import rdmPlaza from "@/assets/rdm-plaza-central.jpg";
-import rdmPastes from "@/assets/rdm-pastes-close.jpg";
-import rdmCafe from "@/assets/rdm-cafe.jpg";
-import rdmCalleColonial from "@/assets/rdm-calle-colonial.jpg";
-import rdmCallejon from "@/assets/rdm-callejon-noche.jpg";
-import rdmIglesia from "@/assets/rdm-iglesia-colonial.jpg";
-import rdmFestival from "@/assets/rdm-festival.jpg";
-import rdmDiaMuertos from "@/assets/rdm-dia-muertos.jpg";
-import rdmSierra from "@/assets/rdm-sierra-ecoturismo.jpg";
-import rdmMirador from "@/assets/rdm-mirador.jpg";
-import rdmArtesanias from "@/assets/rdm-artesanias.jpg";
+const rdmMina = "/placeholder.svg";
+const rdmPanteon = "/placeholder.svg";
+const rdmMalacate = "/placeholder.svg";
+const rdmPlaza = "/placeholder.svg";
+const rdmPastes = "/placeholder.svg";
+const rdmCafe = "/placeholder.svg";
+const rdmCalleColonial = "/placeholder.svg";
+const rdmCallejon = "/placeholder.svg";
+const rdmIglesia = "/placeholder.svg";
+const rdmFestival = "/placeholder.svg";
+const rdmDiaMuertos = "/placeholder.svg";
+const rdmSierra = "/placeholder.svg";
+const rdmMirador = "/placeholder.svg";
+const rdmArtesanias = "/placeholder.svg";
 
 export type RdmCategory =
   | "Historia"

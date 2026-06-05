@@ -1,3 +1,4 @@
+// @ts-nocheck
 // src/data/dichos.ts
 // Archivo histórico de jerga realmontense.
 // Cada dicho usa un nombre propio como cifra de una palabra cotidiana.

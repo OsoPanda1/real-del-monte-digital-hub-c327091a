@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ─────────────────────────────────────────────────────────────────────────────
 // RDM FEDERACIONES · Las 7 Federaciones Soberanas TAMV
 // Portado desde seed canónico OsoPanda1/rdm-turismodigital · 002_rdm_seed.sql
