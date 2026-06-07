@@ -9,6 +9,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import CinematicIntro from "@/components/CinematicIntro";
 import MicroPageIntro from "@/components/MicroPageIntro";
 import RealitoChatLauncher from "./components/RealitoChatLauncher";
+import { RDMAuthProvider } from "@/contexts/RDMAuthContext";
 
 // ===== Mother repo pages =====
 const Index = lazy(() => import("./pages/Index"));
@@ -104,6 +105,8 @@ const AtlasCalles = lazy(() => import("./pages/AtlasCalles"));
 const AtlasLeyendas = lazy(() => import("./pages/AtlasLeyendas"));
 const AtlasMaximus = lazy(() => import("./pages/AtlasMaximus"));
 const EcosistemaLTOS = lazy(() => import("./pages/EcosistemaLTOS"));
+const Perfil = lazy(() => import("./pages/Perfil"));
+const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 
 
 const queryClient = new QueryClient({
@@ -230,6 +233,11 @@ const AnimatedRoutes = () => {
           <Route path="/ecosistema-ltos" element={<EcosistemaLTOS />} />
           <Route path="/repos" element={<EcosistemaLTOS />} />
 
+          {/* === Auth + Gamification === */}
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/ranking" element={<Leaderboard />} />
+
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -275,7 +283,9 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AppInner />
+        <RDMAuthProvider>
+          <AppInner />
+        </RDMAuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );
