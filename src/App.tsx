@@ -9,6 +9,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import CinematicIntro from "@/components/CinematicIntro";
 import MicroPageIntro from "@/components/MicroPageIntro";
 import RealitoChatLauncher from "./components/RealitoChatLauncher";
+import { RDMAuthProvider } from "@/contexts/RDMAuthContext";
 
 // ===== Mother repo pages =====
 const Index = lazy(() => import("./pages/Index"));
@@ -282,7 +283,9 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AppInner />
+        <RDMAuthProvider>
+          <AppInner />
+        </RDMAuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );

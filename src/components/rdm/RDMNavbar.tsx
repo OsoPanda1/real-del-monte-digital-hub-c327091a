@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mountain, Menu, X, MapPin, Utensils, Pickaxe, TreePine, Compass, Calendar, Car, ChevronDown } from "lucide-react";
+import { Mountain, Menu, X, MapPin, Utensils, Pickaxe, TreePine, Compass, Calendar, Car, ChevronDown, Trophy, User as UserIcon, LogIn } from "lucide-react";
+import { useRDMAuth } from "@/contexts/RDMAuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const TURISMO_LINKS = [
   { path: "/", label: "Inicio" },
@@ -24,6 +26,7 @@ const MAS_LINKS = [
   { path: "/atlas-maximus", label: "Atlas Maximus" },
   { path: "/dichos-mineros", label: "Dichos Mineros" },
   { path: "/ecosistema-ltos", label: "Ecosistema LTOS" },
+  { path: "/leaderboard", label: "🏆 Tabla de Honor" },
 ];
 
 export function RDMNavbar() {
@@ -31,6 +34,7 @@ export function RDMNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [masOpen, setMasOpen] = useState(false);
   const location = useLocation();
+  const { user, profile } = useRDMAuth();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 50);
@@ -137,6 +141,29 @@ export function RDMNavbar() {
             >
               Apoya
             </Link>
+
+            {user ? (
+              <Link to="/perfil" className="ml-1 flex items-center gap-2 p-1 rounded-full hover:bg-[hsl(var(--rdm-amber)/0.1)]" title="Mi perfil">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={profile?.avatar_url ?? undefined} />
+                  <AvatarFallback className="text-[10px] bg-[hsl(var(--rdm-amber))] text-white">
+                    {profile?.display_name?.slice(0, 2).toUpperCase() ?? <UserIcon className="h-3 w-3" />}
+                  </AvatarFallback>
+                </Avatar>
+                {profile && (
+                  <span className="hidden xl:flex items-center gap-1 text-[10px] font-semibold text-[hsl(var(--rdm-amber))]">
+                    <Trophy className="h-3 w-3" /> {profile.total_points}
+                  </span>
+                )}
+              </Link>
+            ) : (
+              <Link
+                to="/auth"
+                className="ml-1 flex items-center gap-1 px-3 py-2 text-xs font-medium rounded-lg border border-[hsl(var(--rdm-amber))] text-[hsl(var(--rdm-amber))] hover:bg-[hsl(var(--rdm-amber)/0.1)]"
+              >
+                <LogIn className="h-3 w-3" /> Entrar
+              </Link>
+            )}
           </div>
 
           {/* Mobile toggle */}
