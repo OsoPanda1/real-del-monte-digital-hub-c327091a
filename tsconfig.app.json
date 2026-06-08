@@ -17,9 +17,15 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"],
+      "@geo-engine": ["./packages/geo-engine/src/index.ts"],
+      "@geo-engine/*": ["./packages/geo-engine/src/*"],
+      "@core-kernel": ["./packages/core-kernel/src/index.ts"],
+      "@core-kernel/*": ["./packages/core-kernel/src/*"],
+      "@data-models": ["./packages/data-models/src/index.ts"],
+      "@data-models/*": ["./packages/data-models/src/*"],
+      "@ui-kit": ["./packages/ui-kit/src/index.ts"],
+      "@ui-kit/*": ["./packages/ui-kit/src/*"]
     },
     "skipLibCheck": true,
     "strict": false,
@@ -30,6 +36,7 @@
     "useDefineForClassFields": true
   },
   "include": [
-    "src"
+    "src",
+    "packages/*/src"
   ]
 }
