@@ -16,6 +16,10 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@geo-engine": path.resolve(__dirname, "./packages/geo-engine/src"),
+      "@core-kernel": path.resolve(__dirname, "./packages/core-kernel/src"),
+      "@data-models": path.resolve(__dirname, "./packages/data-models/src"),
+      "@ui-kit": path.resolve(__dirname, "./packages/ui-kit/src"),
     },
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime"],
   },
