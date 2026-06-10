@@ -174,28 +174,39 @@ const AudioWaveform = ({ analyser }: { analyser: AnalyserNode | null }) => {
 const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
   const [phase, setPhase] = useState(0);
   const [started, setStarted] = useState(false);
+  const [overlayVisible, setOverlayVisible] = useState(true);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const introDoneRef = useRef(false);
   const minPlayTimeoutRef = useRef<number | null>(null);
   const fadeIntervalRef = useRef<number | null>(null);
+  const fadeInIntervalRef = useRef<number | null>(null);
+  const cleanupCalledRef = useRef(false);
 
   const stopAudio = useCallback(() => {
-    if (minPlayTimeoutRef.current) {
+    if (minPlayTimeoutRef.current !== null) {
       clearTimeout(minPlayTimeoutRef.current);
       minPlayTimeoutRef.current = null;
     }
 
-    if (fadeIntervalRef.current) {
+    if (fadeIntervalRef.current !== null) {
       clearInterval(fadeIntervalRef.current);
       fadeIntervalRef.current = null;
     }
 
+    if (fadeInIntervalRef.current !== null) {
+      clearInterval(fadeInIntervalRef.current);
+      fadeInIntervalRef.current = null;
+    }
+
     if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+      try {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      } catch {}
       audioRef.current = null;
     }
 
@@ -204,15 +215,18 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
       audioCtxRef.current = null;
     }
 
+    sourceRef.current = null;
     setAnalyser(null);
   }, []);
 
   const handleSkip = useCallback(() => {
+    if (cleanupCalledRef.current) return;
+    cleanupCalledRef.current = true;
     stopAudio();
+    setOverlayVisible(false);
     onComplete();
   }, [onComplete, stopAudio]);
 
-  // ESC para saltar
   useEffect(() => {
     if (!started) return;
 
@@ -229,7 +243,8 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
     setStarted(true);
 
     try {
-      const ctx = new AudioContext();
+      const Ctor = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new Ctor();
 
       if (ctx.state === "suspended") {
         await ctx.resume();
@@ -243,14 +258,13 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
       audioRef.current = audio;
 
       const source = ctx.createMediaElementSource(audio);
+      sourceRef.current = source;
 
-      // Analyser para visualizaciones
       const anal = ctx.createAnalyser();
       anal.fftSize = 512;
-      anal.smoothingTimeConstant = 2.85;
+      anal.smoothingTimeConstant = 0.85;
       setAnalyser(anal);
 
-      // Cadena ligera de FX
       const bass = ctx.createBiquadFilter();
       bass.type = "lowshelf";
       bass.frequency.value = 280;
@@ -280,54 +294,57 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
       const dry = ctx.createGain();
       dry.gain.value = 1.0;
 
-      // Ruta principal
       source.connect(bass);
       bass.connect(high);
       high.connect(dry);
       dry.connect(compressor);
 
-      // Ruta eco
       source.connect(delay);
       delay.connect(feedback);
       feedback.connect(delay);
       delay.connect(wet);
       wet.connect(compressor);
 
-      // Hacia analyser + salida
       compressor.connect(anal);
       anal.connect(ctx.destination);
 
-      // Fade in
       audio.volume = 0;
-      audio
-        .play()
-        .then(() => {
-          let vol = 0;
-          const fadeIn = window.setInterval(() => {
-            if (!audioRef.current) {
-              clearInterval(fadeIn);
-              return;
-            }
-            vol = Math.min(vol + 0.15, 1);
-            audioRef.current.volume = vol;
-            if (vol >= 1) clearInterval(fadeIn);
-          }, 80);
-        })
-        .catch((err) => {
-          console.warn("Audio play failed:", err);
-        });
 
-      // Mantener audio al menos 90 segundos
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        await playPromise;
+      }
+
+      fadeInIntervalRef.current = window.setInterval(() => {
+        if (!audioRef.current) {
+          if (fadeInIntervalRef.current !== null) {
+            clearInterval(fadeInIntervalRef.current);
+            fadeInIntervalRef.current = null;
+          }
+          return;
+        }
+
+        const nextVol = Math.min(audioRef.current.volume + 0.15, 1);
+        audioRef.current.volume = nextVol;
+
+        if (nextVol >= 1) {
+          if (fadeInIntervalRef.current !== null) {
+            clearInterval(fadeInIntervalRef.current);
+            fadeInIntervalRef.current = null;
+          }
+        }
+      }, 80);
+
       const MIN_PLAY_MS = 90_000;
       const FADE_OUT_STEP_MS = 80;
-      const FADE_OUT_STEP_DELTA = 0.23;
+      const FADE_OUT_STEP_DELTA = 0.03;
 
       minPlayTimeoutRef.current = window.setTimeout(() => {
         if (!audioRef.current) return;
 
         fadeIntervalRef.current = window.setInterval(() => {
           if (!audioRef.current) {
-            if (fadeIntervalRef.current) {
+            if (fadeIntervalRef.current !== null) {
               clearInterval(fadeIntervalRef.current);
               fadeIntervalRef.current = null;
             }
@@ -338,7 +355,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
           audioRef.current.volume = nextVol;
 
           if (nextVol <= 0) {
-            if (fadeIntervalRef.current) {
+            if (fadeIntervalRef.current !== null) {
               clearInterval(fadeIntervalRef.current);
               fadeIntervalRef.current = null;
             }
@@ -348,15 +365,13 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
       }, MIN_PLAY_MS);
 
       audio.addEventListener("ended", () => {
-        if (introDoneRef.current) return;
         introDoneRef.current = true;
       });
     } catch (e) {
-      console.warn("Audio init failed:", e);
+      console.error("Audio init failed:", e);
     }
   };
 
-  // Fases visuales
   useEffect(() => {
     if (!started) return;
 
@@ -368,6 +383,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
       setTimeout(() => setPhase(5), 9900),
       setTimeout(() => {
         introDoneRef.current = true;
+        setOverlayVisible(false);
         onComplete();
       }, 28_300),
     ];
@@ -375,16 +391,17 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
     return () => timers.forEach(clearTimeout);
   }, [started, onComplete]);
 
-  // Limpieza global
   useEffect(() => {
     return () => {
+      if (cleanupCalledRef.current) return;
+      cleanupCalledRef.current = true;
       stopAudio();
     };
   }, [stopAudio]);
 
   return (
     <AnimatePresence>
-      {(!started || phase < 5) && (
+      {overlayVisible && (
         <motion.div
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
