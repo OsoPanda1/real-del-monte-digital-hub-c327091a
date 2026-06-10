@@ -1,4 +1,6 @@
 import { lazy, Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import TerritorialSVGMap from "@/components/map/TerritorialSVGMap";
 import { Award, Filter, Layers, LocateFixed, MapPin, Phone, Radar, Search, Star, Zap, Compass, Activity, Cpu, DatabaseZap, Workflow } from "lucide-react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
@@ -33,6 +35,7 @@ const markers: MapMarkerData[] = [
 ];
 
 function MapaPageContent() {
+  const [searchParams] = useSearchParams();
   const [filter, setFilter] = useState<"all" | MarkerType>("all");
   const [selected, setSelected] = useState<MapMarkerData | null>(markers[0]);
   const [query, setQuery] = useState("");
@@ -174,6 +177,20 @@ function MapaPageContent() {
                 </div>
               </div>
             ))}
+          </section>
+
+          {/* Mapa Soberano SVG inmersivo (POIs glassmórficos + tooltips narrativos) */}
+          <section className="space-y-3">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.28em] text-gold-400">Capa simbólica</p>
+                <h2 className="font-serif text-2xl md:text-3xl text-silver-200">Mapa Soberano del Nodo Cero</h2>
+              </div>
+              <p className="text-xs text-silver-400 max-w-md">
+                Vista narrativa de las federaciones territoriales. Cada POI revela su memoria al posar el cursor.
+              </p>
+            </div>
+            <TerritorialSVGMap highlightId={searchParams.get("poi") ?? undefined} />
           </section>
 
           <section className="grid gap-6 lg:grid-cols-12">

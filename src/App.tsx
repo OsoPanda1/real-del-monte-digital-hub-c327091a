@@ -11,6 +11,8 @@ import MicroPageIntro from "@/components/MicroPageIntro";
 import RealitoChatLauncher from "./components/RealitoChatLauncher";
 import AmbientLayer from "@/components/AmbientLayer";
 import LiveTelemetryBadge from "@/components/LiveTelemetryBadge";
+import SearchOverlay from "@/components/SearchOverlay";
+import CompassNav from "@/components/CompassNav";
 import { RDMAuthProvider } from "@/contexts/RDMAuthContext";
 
 // ===== Mother repo pages =====
@@ -275,6 +277,8 @@ const AppInner = () => {
             <MicroPageIntro />
             <AnimatedRoutes />
             <LiveTelemetryBadge />
+            <SearchOverlay />
+            <CompassNav />
           </>
         )}
         <RealitoChatLauncher />
