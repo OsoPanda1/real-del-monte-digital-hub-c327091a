@@ -44,7 +44,7 @@ const AudioEqualizer = ({ analyser }: { analyser: AnalyserNode | null }) => {
         const y = h - barH;
 
         const grad = ctx.createLinearGradient(x, h, x, y);
-        grad.addColorStop(0, `hsla(43, 90%, 55%, ${0.4 + rawVal * 0.5})`);
+        grad.addColorStop(0, `hsla(43, 75%, 65%, ${0.4 + rawVal * 0.9})`);
         grad.addColorStop(0.5, `hsla(210, 80%, 65%, ${0.45 + rawVal * 0.4})`);
         grad.addColorStop(1, `hsla(280, 60%, 70%, ${0.3 + rawVal * 0.4})`);
 
@@ -224,14 +224,14 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
       // Analyser para visualizaciones
       const anal = ctx.createAnalyser();
       anal.fftSize = 512;
-      anal.smoothingTimeConstant = 0.85;
+      anal.smoothingTimeConstant = 1.85;
       setAnalyser(anal);
 
       // Cadena ligera de FX
       const bass = ctx.createBiquadFilter();
       bass.type = "lowshelf";
-      bass.frequency.value = 180;
-      bass.gain.value = 4;
+      bass.frequency.value = 280;
+      bass.gain.value = 6;
 
       const high = ctx.createBiquadFilter();
       high.type = "highshelf";
@@ -242,7 +242,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
       compressor.threshold.value = -26;
       compressor.knee.value = 24;
       compressor.ratio.value = 3.5;
-      compressor.attack.value = 0.003;
+      compressor.attack.value = 0.013;
       compressor.release.value = 0.25;
 
       const delay = ctx.createDelay(1.0);
@@ -281,7 +281,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
         .then(() => {
           let vol = 0;
           const fadeIn = setInterval(() => {
-            vol = Math.min(vol + 0.05, 1);
+            vol = Math.min(vol + 0.15, 1);
             audio.volume = vol;
             if (vol >= 1) clearInterval(fadeIn);
           }, 80);
@@ -295,28 +295,32 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
         handleSkip();
       });
 
-      // Fade out cronometrado (por si el mp3 es más largo)
-      setTimeout(() => {
-        if (!audioRef.current) return;
-        let vol = audioRef.current.volume;
-        const fadeOut = setInterval(() => {
-          if (!audioRef.current) {
-            clearInterval(fadeOut);
-            return;
-          }
-          vol = Math.max(vol - 0.05, 0);
-          audioRef.current.volume = vol;
-          if (vol <= 0) {
-            clearInterval(fadeOut);
-            audioRef.current.pause();
-          }
-        }, 60);
-      }, 9000);
-    } catch (e) {
-      console.warn("Audio init failed:", e);
-    }
-  };
+    // Fade out cronometrado (por si el mp3 es más largo)
+// Inicia el fade-out a los ~60 segundos
+const FADE_OUT_START_MS = 60_000; // 60 segundos
+const FADE_OUT_STEP_MS = 80;      // cada 80 ms baja volumen
+const FADE_OUT_STEP_DELTA = 0.03; // baja 0.03 por paso
 
+setTimeout(() => {
+  if (!audioRef.current) return;
+
+  let vol = audioRef.current.volume;
+  const fadeOut = setInterval(() => {
+    if (!audioRef.current) {
+      clearInterval(fadeOut);
+      return;
+    }
+
+    vol = Math.max(vol - FADE_OUT_STEP_DELTA, 0);
+    audioRef.current.volume = vol;
+
+    if (vol <= 0) {
+      clearInterval(fadeOut);
+      audioRef.current.pause();
+    }
+  }, FADE_OUT_STEP_MS);
+}, FADE_OUT_START_MS);
+      
   // Fases visuales
   useEffect(() => {
     if (!started) return;
