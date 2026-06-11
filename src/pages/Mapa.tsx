@@ -1,6 +1,7 @@
-import { lazy, Suspense, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import TerritorialSVGMap from "@/components/map/TerritorialSVGMap";
+import POIDetailPanel from "@/components/map/POIDetailPanel";
 import { Award, Filter, Layers, LocateFixed, MapPin, Phone, Radar, Search, Star, Zap, Compass, Activity, Cpu, DatabaseZap, Workflow } from "lucide-react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
@@ -35,12 +36,25 @@ const markers: MapMarkerData[] = [
 ];
 
 function MapaPageContent() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filter, setFilter] = useState<"all" | MarkerType>("all");
   const [selected, setSelected] = useState<MapMarkerData | null>(markers[0]);
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState<"2d" | "3d">("2d");
   const { viewport, syncFrom2D, syncFrom3D } = useMapSync();
+
+  // POI de territorio (panel deslizante) sincronizado con ?poi=
+  const territoryPoiId = searchParams.get("poi");
+  const handleSelectTerritoryPOI = (id: string) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("poi", id);
+    setSearchParams(next, { replace: false });
+  };
+  const handleClosePOIPanel = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete("poi");
+    setSearchParams(next, { replace: true });
+  };
 
   const handleFilterChange = (nextFilter: MarkerType | "all") => {
     setFilter(nextFilter);
@@ -190,8 +204,14 @@ function MapaPageContent() {
                 Vista narrativa de las federaciones territoriales. Cada POI revela su memoria al posar el cursor.
               </p>
             </div>
-            <TerritorialSVGMap highlightId={searchParams.get("poi") ?? undefined} />
+            <TerritorialSVGMap
+              highlightId={territoryPoiId ?? undefined}
+              selectedId={territoryPoiId}
+              onSelect={handleSelectTerritoryPOI}
+            />
           </section>
+
+          <POIDetailPanel poiId={territoryPoiId} onClose={handleClosePOIPanel} />
 
           <section className="grid gap-6 lg:grid-cols-12">
             <div className="space-y-4 lg:col-span-8">

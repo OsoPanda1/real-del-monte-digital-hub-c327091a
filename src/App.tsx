@@ -13,6 +13,7 @@ import AmbientLayer from "@/components/AmbientLayer";
 import LiveTelemetryBadge from "@/components/LiveTelemetryBadge";
 import SearchOverlay from "@/components/SearchOverlay";
 import CompassNav from "@/components/CompassNav";
+import SmartSidebar from "@/components/SmartSidebar";
 import { RDMAuthProvider } from "@/contexts/RDMAuthContext";
 
 // ===== Mother repo pages =====
@@ -279,6 +280,7 @@ const AppInner = () => {
             <LiveTelemetryBadge />
             <SearchOverlay />
             <CompassNav />
+            <SmartSidebar />
           </>
         )}
         <RealitoChatLauncher />
