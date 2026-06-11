@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Compass, MapPin, BookOpen, Users, Building2, Sparkles, Route as RouteIcon, Pickaxe, Utensils } from "lucide-react";
+import { ChevronLeft, ChevronRight, Compass, MapPin, BookOpen, Users, Building2, Sparkles } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface SidebarLink {
