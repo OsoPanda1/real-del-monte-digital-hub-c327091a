@@ -44,6 +44,21 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_email_whitelist: {
+        Row: {
+          created_at: string
+          email: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           category: string
@@ -208,6 +223,51 @@ export type Database = {
           location?: string | null
           total_points?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      songs: {
+        Row: {
+          artist: string | null
+          created_at: string
+          description: string | null
+          duration_seconds: number | null
+          id: string
+          is_public: boolean
+          mime_type: string
+          size_bytes: number | null
+          storage_path: string
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          artist?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_public?: boolean
+          mime_type: string
+          size_bytes?: number | null
+          storage_path: string
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          artist?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_public?: boolean
+          mime_type?: string
+          size_bytes?: number | null
+          storage_path?: string
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
         }
         Relationships: []
       }
