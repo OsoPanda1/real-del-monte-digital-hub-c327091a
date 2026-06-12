@@ -37,12 +37,14 @@ export function ModuleCinematicIntro({
         alt="Fondo cinematográfico de Real del Monte"
         className="absolute inset-0 h-full w-full object-cover"
         loading="eager"
+        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
       />
       <img
         src={cinematicOverlay}
         alt="Capa visual inmersiva"
         className="absolute inset-0 h-full w-full object-cover opacity-55 mix-blend-screen"
         loading="eager"
+        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
       />
 
       <div
