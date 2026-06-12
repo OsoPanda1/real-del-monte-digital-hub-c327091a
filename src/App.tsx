@@ -35,6 +35,7 @@ const Auth = lazy(() => import("./pages/Auth"));
 const Apoya = lazy(() => import("./pages/Apoya"));
 const Reglamento = lazy(() => import("./pages/Reglamento"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminMusica = lazy(() => import("./pages/admin/Musica"));
 const Dichos = lazy(() => import("./pages/Dichos"));
 const Catalogo = lazy(() => import("./pages/Catalogo"));
 const NegociosPortal = lazy(() => import("./pages/NegociosPortal"));
