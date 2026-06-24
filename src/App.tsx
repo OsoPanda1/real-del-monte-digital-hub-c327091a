@@ -1,119 +1,120 @@
-import { useState, useCallback, lazy, Suspense } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AnimatePresence } from "framer-motion";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import CinematicIntro from "@/components/CinematicIntro";
-import MicroPageIntro from "@/components/MicroPageIntro";
-import RealitoChatLauncher from "./components/RealitoChatLauncher";
-import AmbientLayer from "@/components/AmbientLayer";
-import LiveTelemetryBadge from "@/components/LiveTelemetryBadge";
-import SearchOverlay from "@/components/SearchOverlay";
-import CompassNav from "@/components/CompassNav";
-import SmartSidebar from "@/components/SmartSidebar";
-import { RDMAuthProvider } from "@/contexts/RDMAuthContext";
+// src/App.tsx
+
+import { useState, useCallback, lazy, Suspense } from 'react'
+import { Toaster } from '@/components/ui/toaster'
+import { Toaster as Sonner } from '@/components/ui/sonner'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AnimatePresence } from 'framer-motion'
+import ErrorBoundary from '@/components/ErrorBoundary'
+import CinematicIntro from '@/components/CinematicIntro'
+import MicroPageIntro from '@/components/MicroPageIntro'
+import RealitoChatLauncher from './components/RealitoChatLauncher'
+import AmbientLayer from '@/components/AmbientLayer'
+import LiveTelemetryBadge from '@/components/LiveTelemetryBadge'
+import SearchOverlay from '@/components/SearchOverlay'
+import CompassNav from '@/components/CompassNav'
+import SmartSidebar from '@/components/SmartSidebar'
+import { RDMAuthProvider, useRDMAuth } from '@/contexts/RDMAuthContext'
 
 // ===== Mother repo pages =====
-const Index = lazy(() => import("./pages/Index"));
-const Lugares = lazy(() => import("./pages/Lugares"));
-const Directorio = lazy(() => import("./pages/Directorio"));
-const Eventos = lazy(() => import("./pages/Eventos"));
-const Comunidad = lazy(() => import("./pages/Comunidad"));
-const Mapa = lazy(() => import("./pages/Mapa"));
-const Historia = lazy(() => import("./pages/Historia"));
-const Cultura = lazy(() => import("./pages/Cultura"));
-const Relatos = lazy(() => import("./pages/Relatos"));
-const Ecoturismo = lazy(() => import("./pages/Ecoturismo"));
-const Gastronomia = lazy(() => import("./pages/Gastronomia"));
-const Arte = lazy(() => import("./pages/Arte"));
-const Rutas = lazy(() => import("./pages/Rutas"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const Auth = lazy(() => import("./pages/Auth"));
-const Apoya = lazy(() => import("./pages/Apoya"));
-const Reglamento = lazy(() => import("./pages/Reglamento"));
-const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
-const AdminMusica = lazy(() => import("./pages/admin/Musica"));
-const Dichos = lazy(() => import("./pages/Dichos"));
-const Catalogo = lazy(() => import("./pages/Catalogo"));
-const NegociosPortal = lazy(() => import("./pages/NegociosPortal"));
+const Index = lazy(() => import('./pages/Index'))
+const Lugares = lazy(() => import('./pages/Lugares'))
+const Directorio = lazy(() => import('./pages/Directorio'))
+const Eventos = lazy(() => import('./pages/Eventos'))
+const Comunidad = lazy(() => import('./pages/Comunidad'))
+const Mapa = lazy(() => import('./pages/Mapa'))
+const Historia = lazy(() => import('./pages/Historia'))
+const Cultura = lazy(() => import('./pages/Cultura'))
+const Relatos = lazy(() => import('./pages/Relatos'))
+const Ecoturismo = lazy(() => import('./pages/Ecoturismo'))
+const Gastronomia = lazy(() => import('./pages/Gastronomia'))
+const Arte = lazy(() => import('./pages/Arte'))
+const Rutas = lazy(() => import('./pages/Rutas'))
+const NotFound = lazy(() => import('./pages/NotFound'))
+const Auth = lazy(() => import('./pages/Auth'))
+const Apoya = lazy(() => import('./pages/Apoya'))
+const Reglamento = lazy(() => import('./pages/Reglamento'))
+const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'))
+const AdminMusica = lazy(() => import('./pages/admin/Musica'))
+const Dichos = lazy(() => import('./pages/Dichos'))
+const Catalogo = lazy(() => import('./pages/Catalogo'))
+const NegociosPortal = lazy(() => import('./pages/NegociosPortal'))
 
 // ===== Smart City OS pages =====
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Comercios = lazy(() => import("./pages/Comercios"));
-const Paquetes = lazy(() => import("./pages/Paquetes"));
-const ComunidadPage = lazy(() => import("./pages/ComunidadPage"));
-const TransporteLocal = lazy(() => import("./pages/TransporteLocal"));
-const ShuttleCDMX = lazy(() => import("./pages/ShuttleCDMX"));
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Comercios = lazy(() => import('./pages/Comercios'))
+const Paquetes = lazy(() => import('./pages/Paquetes'))
+const ComunidadPage = lazy(() => import('./pages/ComunidadPage'))
+const TransporteLocal = lazy(() => import('./pages/TransporteLocal'))
+const ShuttleCDMX = lazy(() => import('./pages/ShuttleCDMX'))
 
 // ===== RDM Digital-X pages =====
-const QuienesSomos = lazy(() => import("./pages/QuienesSomos"));
-const Donar = lazy(() => import("./pages/Donar"));
-const GraciasDonativo = lazy(() => import("./pages/GraciasDonativo"));
-const ComerciosPanel = lazy(() => import("./pages/ComerciosPanel"));
+const QuienesSomos = lazy(() => import('./pages/QuienesSomos'))
+const Donar = lazy(() => import('./pages/Donar'))
+const GraciasDonativo = lazy(() => import('./pages/GraciasDonativo'))
+const ComerciosPanel = lazy(() => import('./pages/ComerciosPanel'))
 
 // ===== Elevated pages =====
-const MapaVivo = lazy(() => import("./pages/MapaVivo"));
-const RegistroComercio = lazy(() => import("./pages/RegistroComercio"));
+const MapaVivo = lazy(() => import('./pages/MapaVivo'))
+const RegistroComercio = lazy(() => import('./pages/RegistroComercio'))
 
 // ===== Citemesh / Wiki pages =====
-const Introduccion = lazy(() => import("./pages/Introduccion"));
-const Filosofia = lazy(() => import("./pages/Filosofia"));
-const Arquitectura = lazy(() => import("./pages/Arquitectura"));
-const DomainPage = lazy(() => import("./pages/DomainPage"));
-const IAAgentes = lazy(() => import("./pages/IAAgentes"));
-const Timeline = lazy(() => import("./pages/Timeline"));
-const Documentacion = lazy(() => import("./pages/Documentacion"));
-const Gobernanza = lazy(() => import("./pages/Gobernanza"));
-const SistemasAvanzados = lazy(() => import("./pages/SistemasAvanzados"));
-const Manuales = lazy(() => import("./pages/Manuales"));
-const Despliegue = lazy(() => import("./pages/Despliegue"));
-const BiografiaCEO = lazy(() => import("./pages/BiografiaCEO"));
-const CasosDeUso = lazy(() => import("./pages/CasosDeUso"));
-const KitAPIs = lazy(() => import("./pages/KitAPIs"));
-const Estrategia = lazy(() => import("./pages/Estrategia"));
-const WikiTAMV = lazy(() => import("./pages/WikiTAMV"));
-const RedSocial = lazy(() => import("./pages/RedSocial"));
-const SeguridadTenochtitlan = lazy(() => import("./pages/SeguridadTenochtitlan"));
-const BlockchainMSR = lazy(() => import("./pages/BlockchainMSR"));
-const XRTecnologia = lazy(() => import("./pages/XRTecnologia"));
-const EconomiaFederada = lazy(() => import("./pages/EconomiaFederada"));
-const QuantumComputing = lazy(() => import("./pages/QuantumComputing"));
-const EnciclopediaUniversal = lazy(() => import("./pages/EnciclopediaUniversal"));
-const IsabellaAI = lazy(() => import("./pages/IsabellaAI"));
-const ImpactoCivilizatorio = lazy(() => import("./pages/ImpactoCivilizatorio"));
+const Introduccion = lazy(() => import('./pages/Introduccion'))
+const Filosofia = lazy(() => import('./pages/Filosofia'))
+const Arquitectura = lazy(() => import('./pages/Arquitectura'))
+const DomainPage = lazy(() => import('./pages/DomainPage'))
+const IAAgentes = lazy(() => import('./pages/IAAgentes'))
+const Timeline = lazy(() => import('./pages/Timeline'))
+const Documentacion = lazy(() => import('./pages/Documentacion'))
+const Gobernanza = lazy(() => import('./pages/Gobernanza'))
+const SistemasAvanzados = lazy(() => import('./pages/SistemasAvanzados'))
+const Manuales = lazy(() => import('./pages/Manuales'))
+const Despliegue = lazy(() => import('./pages/Despliegue'))
+const BiografiaCEO = lazy(() => import('./pages/BiografiaCEO'))
+const CasosDeUso = lazy(() => import('./pages/CasosDeUso'))
+const KitAPIs = lazy(() => import('./pages/KitAPIs'))
+const Estrategia = lazy(() => import('./pages/Estrategia'))
+const WikiTAMV = lazy(() => import('./pages/WikiTAMV'))
+const RedSocial = lazy(() => import('./pages/RedSocial'))
+const SeguridadTenochtitlan = lazy(() => import('./pages/SeguridadTenochtitlan'))
+const BlockchainMSR = lazy(() => import('./pages/BlockchainMSR'))
+const XRTecnologia = lazy(() => import('./pages/XRTecnologia'))
+const EconomiaFederada = lazy(() => import('./pages/EconomiaFederada'))
+const QuantumComputing = lazy(() => import('./pages/QuantumComputing'))
+const EnciclopediaUniversal = lazy(() => import('./pages/EnciclopediaUniversal'))
+const IsabellaAI = lazy(() => import('./pages/IsabellaAI'))
+const ImpactoCivilizatorio = lazy(() => import('./pages/ImpactoCivilizatorio'))
 
 // ===== Genesis / TAMV pages =====
-const Documentation = lazy(() => import("./pages/Documentation"));
-const Membership = lazy(() => import("./pages/Membership"));
-const MetaverseHome = lazy(() => import("./pages/MetaverseHome"));
-const Register = lazy(() => import("./pages/Register"));
-const Login = lazy(() => import("./pages/Login"));
+const Documentation = lazy(() => import('./pages/Documentation'))
+const Membership = lazy(() => import('./pages/Membership'))
+const MetaverseHome = lazy(() => import('./pages/MetaverseHome'))
+const Register = lazy(() => import('./pages/Register'))
+const Login = lazy(() => import('./pages/Login'))
 
 // ===== Civilizational Core pages =====
-const Guardian = lazy(() => import("./pages/Guardian"));
-const Atlas = lazy(() => import("./pages/Atlas"));
-const DevHub = lazy(() => import("./pages/DevHub"));
-const Feed = lazy(() => import("./pages/Feed"));
+const Guardian = lazy(() => import('./pages/Guardian'))
+const Atlas = lazy(() => import('./pages/Atlas'))
+const DevHub = lazy(() => import('./pages/DevHub'))
+const Feed = lazy(() => import('./pages/Feed'))
 
 // ===== New Tourism pages =====
-const Estacionamientos = lazy(() => import("./pages/Estacionamientos"));
-const PatrimonioCultural = lazy(() => import("./pages/PatrimonioCultural"));
+const Estacionamientos = lazy(() => import('./pages/Estacionamientos'))
+const PatrimonioCultural = lazy(() => import('./pages/PatrimonioCultural'))
 
-// ===== Atlas territorial chapters (integrado de real-del-monte-atlas) =====
-const AtlasCapitulos = lazy(() => import("./pages/AtlasCapitulos"));
-const AtlasMinas = lazy(() => import("./pages/AtlasMinas"));
-const AtlasPastes = lazy(() => import("./pages/AtlasPastes"));
-const AtlasCementerio = lazy(() => import("./pages/AtlasCementerio"));
-const AtlasCalles = lazy(() => import("./pages/AtlasCalles"));
-const AtlasLeyendas = lazy(() => import("./pages/AtlasLeyendas"));
-const AtlasMaximus = lazy(() => import("./pages/AtlasMaximus"));
-const EcosistemaLTOS = lazy(() => import("./pages/EcosistemaLTOS"));
-const Perfil = lazy(() => import("./pages/Perfil"));
-const Leaderboard = lazy(() => import("./pages/Leaderboard"));
-
+// ===== Atlas territorial chapters =====
+const AtlasCapitulos = lazy(() => import('./pages/AtlasCapitulos'))
+const AtlasMinas = lazy(() => import('./pages/AtlasMinas'))
+const AtlasPastes = lazy(() => import('./pages/AtlasPastes'))
+const AtlasCementerio = lazy(() => import('./pages/AtlasCementerio'))
+const AtlasCalles = lazy(() => import('./pages/AtlasCalles'))
+const AtlasLeyendas = lazy(() => import('./pages/AtlasLeyendas'))
+const AtlasMaximus = lazy(() => import('./pages/AtlasMaximus'))
+const EcosistemaLTOS = lazy(() => import('./pages/EcosistemaLTOS'))
+const Perfil = lazy(() => import('./pages/Perfil'))
+const Leaderboard = lazy(() => import('./pages/Leaderboard'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -123,14 +124,46 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
     },
   },
-});
+})
 
+// Fallback visible y accesible para loads de rutas
 const RouteFallback = () => (
-  <div className="min-h-screen w-full animate-pulse bg-background" aria-label="Cargando contenido" />
-);
+  <div
+    className="min-h-screen w-full flex items-center justify-center bg-background"
+    aria-label="Cargando contenido"
+  >
+    <div className="animate-pulse text-muted-foreground">
+      Cargando experiencia territorial…
+    </div>
+  </div>
+)
+
+// Banner global de estado de auth / Supabase
+const AuthStatusBanner = () => {
+  const { isSupabaseReady, error } = useRDMAuth()
+
+  if (isSupabaseReady && !error) return null
+
+  return (
+    <div className="w-full bg-amber-900 text-amber-100 text-xs sm:text-sm px-4 py-2 z-50 shadow-md">
+      {!isSupabaseReady && (
+        <p>
+          Autenticación temporalmente deshabilitada: Supabase no está disponible en este
+          entorno. Puedes seguir explorando mapas, rutas, economía y narrativas sin iniciar
+          sesión.
+        </p>
+      )}
+      {error && (
+        <p className="mt-1">
+          Detalle técnico: <span className="font-mono break-all">{error}</span>
+        </p>
+      )}
+    </div>
+  )
+}
 
 const AnimatedRoutes = () => {
-  const location = useLocation();
+  const location = useLocation()
   return (
     <AnimatePresence mode="wait">
       <Suspense fallback={<RouteFallback />}>
@@ -250,26 +283,31 @@ const AnimatedRoutes = () => {
         </Routes>
       </Suspense>
     </AnimatePresence>
-  );
-};
+  )
+}
 
 const AppInner = () => {
-  const [introComplete, setIntroComplete] = useState(false);
+  const [introComplete, setIntroComplete] = useState(false)
 
   const handleIntroComplete = useCallback(() => {
-    setIntroComplete(true);
-  }, []);
+    setIntroComplete(true)
+  }, [])
 
   const [showIntro] = useState(() => {
-    if (sessionStorage.getItem("rdm_intro_shown")) return false;
-    sessionStorage.setItem("rdm_intro_shown", "true");
-    return true;
-  });
+    if (typeof window !== 'undefined') {
+      if (sessionStorage.getItem('rdm_intro_shown')) return false
+      sessionStorage.setItem('rdm_intro_shown', 'true')
+      return true
+    }
+    return false
+  })
 
   return (
     <ErrorBoundary>
       <TooltipProvider>
         <AmbientLayer />
+        {/* Banner global de estado de auth/Supabase */}
+        <AuthStatusBanner />
         <Toaster />
         <Sonner />
         {showIntro && !introComplete && (
@@ -288,8 +326,8 @@ const AppInner = () => {
         <RealitoChatLauncher />
       </TooltipProvider>
     </ErrorBoundary>
-  );
-};
+  )
+}
 
 const App = () => {
   return (
@@ -300,7 +338,7 @@ const App = () => {
         </RDMAuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
-  );
-};
+  )
+}
 
-export default App;
+export default App
