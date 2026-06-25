@@ -92,9 +92,9 @@ const AudioEqualizer = ({ analyser }: { analyser: AnalyserNode | null }) => {
   return (
     <canvas
       ref={canvasRef}
-      width={480}
-      height={70}
-      className="h-[70px] w-[290px] md:h-[72px] md:w-[420px]"
+      width={520}
+      height={80}
+      className="h-[70px] w-[320px] md:h-[80px] md:w-[520px]"
     />
   )
 }
@@ -164,9 +164,9 @@ const AudioWaveform = ({ analyser }: { analyser: AnalyserNode | null }) => {
   return (
     <canvas
       ref={canvasRef}
-      width={480}
-      height={45}
-      className="h-[30px] w-[280px] opacity-70 md:h-[40px] md:w-[420px]"
+      width={520}
+      height={55}
+      className="h-[34px] w-[320px] opacity-70 md:h-[48px] md:w-[520px]"
     />
   )
 }
@@ -198,18 +198,18 @@ const createStarField = (count: number): Star[] => {
   const stars: Star[] = []
   for (let i = 0; i < count; i++) {
     const layer = (i % 3) as 0 | 1 | 2
-    const sizeBase = layer === 0 ? 0.8 : layer === 1 ? 1.4 : 2.1
+    const sizeBase = layer === 0 ? 0.7 : layer === 1 ? 1.3 : 2.2
 
     stars.push({
       id: i,
-      size: sizeBase + Math.random() * (layer === 2 ? 2.2 : 1.2),
+      size: sizeBase + Math.random() * (layer === 2 ? 2.4 : 1.4),
       baseX: Math.random() * 100,
       baseY: Math.random() * 100,
       color: STAR_COLORS[i % STAR_COLORS.length],
-      driftX: (Math.random() - 0.5) * (layer === 2 ? 80 : 40),
-      driftY: -40 - Math.random() * (layer === 2 ? 110 : 55),
-      duration: 5 + Math.random() * 5,
-      delay: Math.random() * 4,
+      driftX: (Math.random() - 0.5) * (layer === 2 ? 90 : 45),
+      driftY: -40 - Math.random() * (layer === 2 ? 130 : 60),
+      duration: 6 + Math.random() * 6,
+      delay: Math.random() * 4.5,
       layer,
     })
   }
@@ -221,7 +221,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
   const [started, setStarted] = useState(false)
   const [overlayVisible, setOverlayVisible] = useState(true)
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null)
-  const [stars] = useState<Star[]>(() => createStarField(150))
+  const [stars] = useState<Star[]>(() => createStarField(190))
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const audioCtxRef = useRef<AudioContext | null>(null)
@@ -398,7 +398,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
             stopAudio()
           }
         }, 120)
-      }, 62000)
+      }, 64000)
 
       audio.addEventListener("ended", () => {
         setOverlayVisible(false)
@@ -409,23 +409,26 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
     }
   }
 
-  // Timeline de escenas (≈70s)
+  /**
+   * Timeline extendido (≈70s) + 1.5s extra por mensaje
+   * Antes: 0–70s aprox; ahora sumamos margen de lectura.
+   */
   useEffect(() => {
     if (!started) return
 
     const timers = [
-      setTimeout(() => setPhase(1), 800),    // Presentación TAMV
-      setTimeout(() => setPhase(2), 7000),   // Dedicado a Reina
-      setTimeout(() => setPhase(3), 16000),  // Texto emotivo largo
-      setTimeout(() => setPhase(4), 27000),  // A mi madre / oveja negra
-      setTimeout(() => setPhase(5), 36000),  // Real del Monte / cerca del cielo
-      setTimeout(() => setPhase(6), 47000),  // Orgullo, memoria y magia
-      setTimeout(() => setPhase(7), 57000),  // Legado
-      setTimeout(() => setPhase(8), 65000),  // Bienvenidos / entrada al proyecto
+      setTimeout(() => setPhase(1), 800),    // TAMV
+      setTimeout(() => setPhase(2), 8500),   // Dedicado a Reina (antes ~7s)
+      setTimeout(() => setPhase(3), 19000),  // Texto emotivo largo
+      setTimeout(() => setPhase(4), 31000),  // A mi madre / oveja negra
+      setTimeout(() => setPhase(5), 41000),  // Real del Monte / cielo
+      setTimeout(() => setPhase(6), 52000),  // Orgullo, memoria y magia
+      setTimeout(() => setPhase(7), 62000),  // Legado
+      setTimeout(() => setPhase(8), 70500),  // Bienvenidos / entrada
       setTimeout(() => {
         setOverlayVisible(false)
         onComplete()
-      }, 70000),
+      }, 76000),
     ]
 
     return () => timers.forEach(clearTimeout)
@@ -502,6 +505,17 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
     }
   })()
 
+  // Secuencia de imágenes que entran y salen (hero + secundarias)
+  const heroImages = [
+    "/images/rdm-hero.png",
+    "/images/realito-pasterias.png",
+    "/images/realito-platerias.png",
+    "/images/realito-sanitarios.png",
+  ]
+
+  const heroIndex =
+    phase <= 2 ? 0 : phase === 3 ? 1 : phase === 4 ? 2 : phase === 5 ? 3 : 0
+
   return (
     <AnimatePresence>
       {overlayVisible && (
@@ -531,28 +545,28 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
               <img
                 src="/images/rdm-hero.png"
                 alt="RDM Digital"
-                className="h-32 w-32 rounded-full object-contain opacity-80 md:h-48 md:w-48"
+                className="h-40 w-40 rounded-full object-cover opacity-90 md:h-56 md:w-56"
                 style={{
                   filter:
-                    "drop-shadow(0 0 30px hsla(210,100%,60%,0.55)) saturate(1.2)",
+                    "drop-shadow(0 0 40px hsla(210,100%,60%,0.7)) saturate(1.25)",
                 }}
               />
               <p
                 className="text-xs tracking-[0.35em] uppercase md:text-sm"
-                style={{ color: "hsl(210 60% 65%)" }}
+                style={{ color: "hsl(210 60% 75%)" }}
               >
                 Toca para iniciar la experiencia sonora
               </p>
               <motion.div
                 className="flex h-16 w-16 items-center justify-center rounded-full border-2"
                 style={{
-                  borderColor: "hsla(210, 80%, 60%, 0.5)",
+                  borderColor: "hsla(210, 80%, 60%, 0.6)",
                 }}
                 animate={{
-                  scale: [1, 1.12, 1],
+                  scale: [1, 1.14, 1],
                   boxShadow: [
                     "0 0 0px hsla(210,80%,60%,0)",
-                    "0 0 24px hsla(210,80%,60%,0.35)",
+                    "0 0 30px hsla(210,80%,60%,0.45)",
                     "0 0 0px hsla(210,80%,60%,0)",
                   ],
                 }}
@@ -560,7 +574,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
               >
                 <div
                   className="ml-1 h-0 w-0 border-b-[8px] border-t-[8px] border-l-[14px] border-b-transparent border-t-transparent"
-                  style={{ borderLeftColor: "hsl(210 80% 65%)" }}
+                  style={{ borderLeftColor: "hsl(210 80% 70%)" }}
                 />
               </motion.div>
             </motion.div>
@@ -568,27 +582,43 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
 
           {started && (
             <>
-              {/* Fondo hero suavizado */}
+              {/* Fondo hero dinámico a pantalla completa */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={heroIndex}
+                  className="absolute inset-0 z-0"
+                  initial={{ opacity: 0, scale: 1.06 }}
+                  animate={{ opacity: 0.7, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.04 }}
+                  transition={{ duration: 2.3, ease: "easeInOut" }}
+                >
+                  <img
+                    src={heroImages[heroIndex]}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    style={{
+                      filter:
+                        "saturate(0.85) contrast(1.12) brightness(0.65) blur(0.4px)",
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[hsl(220,25%,4%)] via-[hsla(220,20%,2%,0.7)] to-[hsl(220,20%,3%)]" />
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Capa extra oscurecida en momentos clave (para que el texto brille) */}
               <motion.div
-                className="absolute inset-0 z-0"
-                initial={{ opacity: 0, scale: 1.05 }}
-                animate={{ opacity: 0.55, scale: 1 }}
-                transition={{ duration: 2.4 }}
-              >
-                <img
-                  src="/images/rdm-hero.png"
-                  alt=""
-                  className="h-full w-full object-cover"
-                  style={{
-                    filter:
-                      "saturate(0.78) contrast(1.12) brightness(0.58) blur(0.35px)",
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[hsl(220,25%,4%)] via-transparent to-[hsl(220,20%,3%)]" />
-              </motion.div>
+                className="absolute inset-0 z-[1]"
+                animate={{
+                  backgroundColor:
+                    phase === 3 || phase === 4
+                      ? "rgba(0,0,0,0.55)"
+                      : "rgba(0,0,0,0.35)",
+                }}
+                transition={{ duration: 1.4, ease: "easeInOut" }}
+              />
 
               {/* Cielo estelar mágico */}
-              <div className="pointer-events-none absolute inset-0 overflow-hidden">
+              <div className="pointer-events-none absolute inset-0 z-[2] overflow-hidden">
                 {stars.map((star) => (
                   <motion.div
                     key={star.id}
@@ -601,15 +631,15 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                       top: `${star.baseY}%`,
                       boxShadow:
                         star.layer === 2
-                          ? "0 0 18px hsla(43,95%,70%,0.75)"
-                          : "0 0 9px hsla(210,100%,80%,0.7)",
+                          ? "0 0 20px hsla(43,95%,70%,0.8)"
+                          : "0 0 10px hsla(210,100%,80%,0.75)",
                       opacity:
-                        star.layer === 0 ? 0.5 : star.layer === 1 ? 0.8 : 1,
+                        star.layer === 0 ? 0.45 : star.layer === 1 ? 0.8 : 1,
                     }}
                     initial={{ opacity: 0, scale: 0, y: 0, x: 0 }}
                     animate={{
                       opacity: [0, 1, 0.4, 0.9, 0],
-                      scale: [0.4, 1.8, 1.1, 2, 0.6],
+                      scale: [0.4, 1.9, 1.2, 2.1, 0.7],
                       y: [0, star.driftY, star.driftY * 1.1, 0],
                       x: [0, star.driftX, star.driftX * 0.7, 0],
                     }}
@@ -627,7 +657,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                   className="absolute inset-[-20%] blur-3xl"
                   initial={{ opacity: 0 }}
                   animate={
-                    phase >= 1 ? { opacity: [0.18, 0.55, 0.25] } : { opacity: 0 }
+                    phase >= 1 ? { opacity: [0.2, 0.6, 0.3] } : { opacity: 0 }
                   }
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                   style={{
@@ -639,7 +669,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
 
                 {/* Grain sutil */}
                 <div
-                  className="absolute inset-0 opacity-[0.02]"
+                  className="absolute inset-0 opacity-[0.03]"
                   style={{
                     backgroundImage:
                       "repeating-linear-gradient(0deg,transparent,transparent 2px,hsla(0,0%,100%,0.05) 2px,hsla(0,0%,100%,0.05) 4px)",
@@ -647,9 +677,9 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                 />
               </div>
 
-              {/* Anillos concéntricos */}
+              {/* Anillos concéntricos centrales */}
               <motion.div
-                className="pointer-events-none absolute inset-0 flex items-center justify-center"
+                className="pointer-events-none absolute inset-0 z-[3] flex items-center justify-center"
                 initial={{ opacity: 0 }}
                 animate={phase >= 1 ? { opacity: 1 } : {}}
               >
@@ -658,69 +688,68 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                     key={ring}
                     className="absolute rounded-full"
                     style={{
-                      width: `${420 + ring * 160}px`,
-                      height: `${420 + ring * 160}px`,
+                      width: `${520 + ring * 220}px`,
+                      height: `${520 + ring * 220}px`,
                       border: `1px solid ${
                         ring === 1
-                          ? "hsla(43,80%,55%,0.26)"
-                          : "hsla(210,100%,70%,0.22)"
+                          ? "hsla(43,80%,65%,0.3)"
+                          : "hsla(210,100%,70%,0.24)"
                       }`,
                     }}
                     initial={{ opacity: 0, scale: 0.35 }}
                     animate={
                       phase >= 1
                         ? {
-                            opacity: [0, 0.32, 0.12],
-                            scale: [0.35, 1, 1.12],
-                            rotate: ring % 2 === 0 ? [0, 180] : [50, -140],
+                            opacity: [0, 0.38, 0.14],
+                            scale: [0.35, 1, 1.1],
+                            rotate: ring % 2 === 0 ? [0, 220] : [60, -160],
                           }
                         : {}
                     }
                     transition={{
-                      duration: 3 + ring * 0.6,
+                      duration: 3.4 + ring * 0.8,
                       ease: "easeOut",
-                      delay: ring * 0.3,
+                      delay: ring * 0.4,
                     }}
                   />
                 ))}
               </motion.div>
 
-              {/* Núcleo RDM */}
+              {/* Núcleo RDM (más grande, más central) */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.4, filter: "blur(40px)" }}
+                initial={{ opacity: 0, scale: 0.45, filter: "blur(40px)" }}
                 animate={
                   phase >= 1
                     ? { opacity: 1, scale: 1, filter: "blur(0px)" }
                     : {}
                 }
-                transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
-                className="relative z-10 mb-6"
+                transition={{ duration: 1.9, ease: [0.16, 1, 0.3, 1] }}
+                className="relative z-[4] mb-10 flex items-center justify-center"
               >
                 <motion.div
-                  className="absolute inset-0 rounded-full blur-3xl"
+                  className="absolute h-80 w-80 rounded-full blur-3xl md:h-[380px] md:w-[380px]"
                   style={{
                     background:
-                      "radial-gradient(circle,hsla(210,100%,60%,0.35) 0%,hsla(43,80%,50%,0.26) 45%,transparent 80%)",
-                    transform: "scale(2.8)",
+                      "radial-gradient(circle,hsla(210,100%,60%,0.4) 0%,hsla(43,80%,50%,0.3) 45%,transparent 80%)",
                   }}
                   animate={
                     phase >= 1
-                      ? { opacity: [0.3, 0.7, 0.3] }
+                      ? { opacity: [0.35, 0.8, 0.35], scale: [1, 1.05, 1] }
                       : { opacity: 0 }
                   }
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <div
-                  className="relative flex h-36 w-36 items-center justify-center rounded-full md:h-52 md:w-52"
+                  className="relative flex h-40 w-40 items-center justify-center rounded-full md:h-60 md:w-60"
                   style={{
                     background:
-                      "linear-gradient(135deg, hsla(220,30%,15%,0.94), hsla(220,40%,8%,0.98))",
-                    border: "2px solid hsla(43,80%,55%,0.45)",
+                      "linear-gradient(135deg, hsla(220,30%,15%,0.96), hsla(220,40%,8%,0.98))",
+                    border: "2px solid hsla(43,80%,65%,0.55)",
                     boxShadow:
-                      "0 0 70px hsla(210,100%,60%,0.38), inset 0 0 32px hsla(210,100%,60%,0.16)",
+                      "0 0 90px hsla(210,100%,60%,0.4), inset 0 0 42px hsla(210,100%,60%,0.2)",
                   }}
                 >
-                  <div className="text-center">
+                  <div className="text-center px-4">
                     <p
                       className="text-[10px] tracking-[0.3em] uppercase md:text-xs"
                       style={{ color: "hsl(210 70% 70%)" }}
@@ -728,10 +757,10 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                       RDM DIGITAL
                     </p>
                     <h2
-                      className="mt-1 font-serif text-lg font-bold md:text-2xl"
+                      className="mt-1 font-serif text-2xl font-bold md:text-3xl"
                       style={{
                         background:
-                          "linear-gradient(135deg, hsl(43 80% 70%), hsl(43 60% 55%))",
+                          "linear-gradient(135deg, hsl(43 80% 75%), hsl(43 60% 55%))",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                       }}
@@ -739,10 +768,10 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                       REAL DEL
                     </h2>
                     <h2
-                      className="font-serif text-lg font-bold md:text-2xl"
+                      className="font-serif text-2xl font-bold md:text-3xl"
                       style={{
                         background:
-                          "linear-gradient(135deg, hsl(43 80% 70%), hsl(43 60% 55%))",
+                          "linear-gradient(135deg, hsl(210 70% 85%), hsl(43 70% 70%))",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                       }}
@@ -753,19 +782,39 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                 </div>
               </motion.div>
 
-              {/* Bloque de texto: escenas */}
+              {/* Bloque de texto: escenas (centrado, grande, full width) */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={phase}
-                  initial={{ opacity: 0, y: 30, scale: 0.98, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, y: -20, scale: 1.02, filter: "blur(8px)" }}
-                  transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="relative z-10 mb-6 max-w-4xl px-6 text-center"
+                  initial={{
+                    opacity: 0,
+                    y: 36,
+                    scale: 0.98,
+                    filter: "blur(12px)",
+                  }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    filter: "blur(0px)",
+                  }}
+                  exit={{
+                    opacity: 0,
+                    y: -24,
+                    scale: 1.02,
+                    filter: "blur(10px)",
+                  }}
+                  transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+                  className="relative z-[5] mb-8 flex max-w-5xl flex-col items-center px-6 text-center"
                 >
                   <p
-                    className="mb-2 text-[11px] tracking-[0.5em] uppercase md:text-xs"
-                    style={{ color: "hsl(210 55% 70%)" }}
+                    className="mb-3 text-[11px] tracking-[0.55em] uppercase md:text-xs"
+                    style={{
+                      color:
+                        phase === 3 || phase === 4
+                          ? "hsl(43 70% 78%)"
+                          : "hsl(210 55% 72%)",
+                    }}
                   >
                     {scene.tag}
                   </p>
@@ -774,7 +823,9 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                     className="font-serif text-3xl font-bold leading-tight md:text-5xl lg:text-6xl"
                     style={{
                       background:
-                        "linear-gradient(135deg,hsl(0 0% 98%),hsl(43 78% 78%),hsl(210 60% 86%),hsl(0 0% 92%))",
+                        phase === 5 || phase === 6
+                          ? "linear-gradient(135deg,hsl(43 80% 80%),hsl(210 70% 88%))"
+                          : "linear-gradient(135deg,hsl(0 0% 98%),hsl(43 78% 78%),hsl(210 60% 86%),hsl(0 0% 92%))",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                     }}
@@ -786,25 +837,25 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                     className="mx-auto my-4 h-[2px]"
                     style={{
                       background:
-                        "linear-gradient(90deg,transparent,hsl(210 80% 65%),hsl(43 80% 55%),transparent)",
+                        "linear-gradient(90deg,transparent,hsl(210 80% 65%),hsl(43 80% 58%),transparent)",
                     }}
                     initial={{ width: 0 }}
                     animate={{
                       width:
                         phase <= 1
-                          ? "11rem"
+                          ? "12rem"
                           : phase <= 3
-                          ? "15rem"
+                          ? "18rem"
                           : phase <= 5
-                          ? "14rem"
-                          : "10rem",
+                          ? "16rem"
+                          : "12rem",
                     }}
-                    transition={{ duration: 1, ease: "easeOut" }}
+                    transition={{ duration: 1.1, ease: "easeOut" }}
                   />
 
                   <p
-                    className="mx-auto max-w-3xl text-sm leading-7 text-[hsl(210_25%_75%)] md:text-lg"
-                    style={{ textShadow: "0 0 18px rgba(255,255,255,0.08)" }}
+                    className="mx-auto max-w-3xl text-sm leading-7 text-[hsl(210_25%_80%)] md:text-lg"
+                    style={{ textShadow: "0 0 18px rgba(255,255,255,0.1)" }}
                   >
                     {scene.body}
                   </p>
@@ -816,60 +867,66 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                 initial={{ opacity: 0, scaleY: 0.3 }}
                 animate={phase >= 2 ? { opacity: 1, scaleY: 1 } : {}}
                 transition={{ duration: 1.8, delay: 0.6, ease: "easeOut" }}
-                className="relative z-10 mb-4 flex flex-col items-center gap-1"
+                className="relative z-[5] mb-6 flex flex-col items-center gap-1"
               >
                 <AudioEqualizer analyser={analyser} />
                 <AudioWaveform analyser={analyser} />
                 <motion.p
                   initial={{ opacity: 0 }}
-                  animate={phase >= 2 ? { opacity: 0.45 } : {}}
+                  animate={phase >= 2 ? { opacity: 0.5 } : {}}
                   transition={{ delay: 1.2, duration: 1.6 }}
                   className="mt-2 text-[9px] tracking-[0.35em] uppercase"
-                  style={{ color: "hsl(210 40% 55%)" }}
+                  style={{ color: "hsl(210 40% 60%)" }}
                 >
                   rdm · intro sonora territorial
                 </motion.p>
               </motion.div>
 
-              {/* Thumbnails de experiencias, entrando más tarde */}
+              {/* Carrusel inferior: imágenes que entran y salen */}
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={phase >= 5 ? { opacity: 1 } : {}}
+                initial={{ opacity: 0, y: 20 }}
+                animate={phase >= 5 ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 1.8 }}
-                className="absolute bottom-28 z-10 flex justify-center gap-4"
+                className="absolute bottom-24 z-[5] flex w-full justify-center gap-5 px-4"
               >
                 {[
                   { src: "/images/realito-pasterias.png", label: "Gastronomía" },
                   { src: "/images/realito-platerias.png", label: "Artesanías" },
                   { src: "/images/realito-sanitarios.png", label: "Servicios" },
                 ].map((item, i) => (
-                  <motion.div
-                    key={item.label}
-                    initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                    animate={phase >= 5 ? { opacity: 1, y: 0, scale: 1 } : {}}
-                    transition={{ duration: 0.9, delay: i * 0.15 }}
-                    className="group relative"
-                  >
-                    <div
-                      className="h-16 w-16 overflow-hidden rounded-xl md:h-20 md:w-20"
-                      style={{
-                        border: "1px solid hsla(210,100%,70%,0.3)",
-                        boxShadow: "0 0 20px hsla(210,100%,60%,0.2)",
-                      }}
+                  <AnimatePresence key={item.label} mode="wait">
+                    <motion.div
+                      initial={{ opacity: 0, y: 24, scale: 0.9 }}
+                      animate={
+                        phase >= 5
+                          ? { opacity: 1, y: 0, scale: 1 }
+                          : { opacity: 0, y: 24, scale: 0.9 }
+                      }
+                      exit={{ opacity: 0, y: 24, scale: 0.9 }}
+                      transition={{ duration: 1, delay: i * 0.15 }}
+                      className="group relative"
                     >
-                      <img
-                        src={item.src}
-                        alt={item.label}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                    <p
-                      className="mt-1 text-center text-[8px] uppercase tracking-wider md:text-[9px]"
-                      style={{ color: "hsl(210 50% 60%)" }}
-                    >
-                      {item.label}
-                    </p>
-                  </motion.div>
+                      <div
+                        className="h-20 w-20 overflow-hidden rounded-2xl md:h-24 md:w-24"
+                        style={{
+                          border: "1px solid hsla(210,100%,70%,0.35)",
+                          boxShadow: "0 0 24px hsla(210,100%,60%,0.25)",
+                        }}
+                      >
+                        <img
+                          src={item.src}
+                          alt={item.label}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      <p
+                        className="mt-2 text-center text-[9px] uppercase tracking-wider md:text-[10px]"
+                        style={{ color: "hsl(210 55% 68%)" }}
+                      >
+                        {item.label}
+                      </p>
+                    </motion.div>
+                  </AnimatePresence>
                 ))}
               </motion.div>
 
@@ -877,12 +934,12 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={phase >= 3 ? { opacity: 1 } : {}}
-                transition={{ duration: 1.8, delay: 0.5 }}
-                className="absolute bottom-16 z-10 text-center"
+                transition={{ duration: 1.8, delay: 0.7 }}
+                className="absolute bottom-10 z-[5] text-center"
               >
                 <p
                   className="text-[10px] tracking-[0.4em] uppercase md:text-xs"
-                  style={{ color: "hsl(210 40% 50%)" }}
+                  style={{ color: "hsl(210 40% 55%)" }}
                 >
                   Innovación Turística Inteligente
                 </p>
@@ -894,7 +951,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                 animate={phase >= 1 ? { opacity: 0.6 } : {}}
                 whileHover={{ opacity: 1, scale: 1.05 }}
                 onClick={handleSkip}
-                className="absolute bottom-6 right-6 z-50 rounded-full px-4 py-2 text-[10px] tracking-widest uppercase transition-all"
+                className="absolute bottom-6 right-6 z-[50] rounded-full px-4 py-2 text-[10px] tracking-widest uppercase transition-all"
                 style={{
                   background: "hsla(0,0%,100%,0.05)",
                   border: "1px solid hsla(0,0%,100%,0.15)",
