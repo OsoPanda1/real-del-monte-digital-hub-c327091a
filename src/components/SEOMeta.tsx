@@ -14,9 +14,9 @@ interface SEOMetaProps {
 const DEFAULT_META = {
   title: 'RDM Digital - Real del Monte | Pueblo Mágico',
   description: 'Explora Real del Monte, Hidalgo: historia, cultura, ecoturismo, gastronomía y más. Descubre los mejores lugares, eventos y rutas turísticas.',
-  image: '/og-image.jpg',
+  image: '/images/rdm-hero.png',
   siteName: 'RDM Digital',
-  siteUrl: 'https://real-del-monte.com',
+  siteUrl: 'https://visitarealdelmonte.online',
 };
 
 export function SEOMeta({

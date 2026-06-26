@@ -120,9 +120,19 @@ const Leaderboard = lazy(() => import('./pages/Leaderboard'))
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 60 * 1000,
+      // 5 minutos: suficiente para datos de turismo/directorio que no cambian cada segundo
+      staleTime: 5 * 60 * 1000,
+      // Mantener en caché 30 minutos tras quedar sin suscriptores
+      gcTime: 30 * 60 * 1000,
       retry: 1,
+      retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30_000),
       refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+      // Evitar refetch en mount si los datos aún son frescos
+      refetchOnMount: true,
+    },
+    mutations: {
+      retry: 0,
     },
   },
 })
