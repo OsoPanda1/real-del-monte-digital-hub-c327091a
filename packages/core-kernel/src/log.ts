@@ -27,7 +27,7 @@ const SENSITIVE_KEYS = [
 ];
 
 /**
- * Sanitiza objetos para evitar que se escriban secretos en logs.[web:676][web:678]
+ * Sanitiza objetos para evitar que se escriban secretos en logs.
  */
 function sanitize(value: unknown): unknown {
   if (value === null || value === undefined) return value;

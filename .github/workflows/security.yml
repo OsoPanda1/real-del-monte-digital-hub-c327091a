@@ -21,8 +21,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  NODE_VERSION: 20
-  PNPM_VERSION: 9
+  NODE_VERSION: 24
   AUDIT_LEVEL: high
 
 jobs:
@@ -39,7 +38,7 @@ jobs:
         scanner: [gitleaks, trufflehog]
     steps:
       - name: Hardened checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -53,8 +52,8 @@ jobs:
           GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "true"
 
       - name: Upload Gitleaks SARIF
-        if: matrix.scanner == 'gitleaks' && always()
-        uses: github/codeql-action/upload-sarif@v3
+        if: matrix.scanner == 'gitleaks' && always() && hashFiles('gitleaks.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: gitleaks.sarif
 
@@ -80,59 +79,39 @@ jobs:
   # 2) Dependabot-like audit endurecido (deps + lockfile) con cache agresivo
   #
   deps-audit:
-    name: Dependencies · npm/pnpm audit + lock drift
+    name: Dependencies · npm audit + lock drift
     runs-on: ubuntu-latest
     timeout-minutes: 25
     needs: secrets
-    strategy:
-      fail-fast: false
-      matrix:
-        package-manager: [pnpm, npm]
     env:
       FORCE_COLOR: "1"
     steps:
       - name: Hardened checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
-      - name: Setup pnpm
-        if: matrix.package-manager == 'pnpm'
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: ${{ matrix.package-manager }}
+          cache: npm
 
-      - name: Install dependencies (pnpm)
-        if: matrix.package-manager == 'pnpm'
-        run: pnpm install --frozen-lockfile
-
-      - name: Install dependencies (npm)
-        if: matrix.package-manager == 'npm'
+      - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
       - name: npm audit (high+critical)
-        if: matrix.package-manager == 'npm'
         run: npm audit --audit-level=${{ env.AUDIT_LEVEL }}
 
-      - name: pnpm audit (high+critical)
-        if: matrix.package-manager == 'pnpm'
-        run: pnpm audit --audit-level=${{ env.AUDIT_LEVEL }}
-
       - name: better-npm-audit report
-        if: matrix.package-manager == 'npm'
         run: npx --yes better-npm-audit audit --level ${{ env.AUDIT_LEVEL }}
 
-      - name: Detect lockfile drift (package-lock vs pnpm-lock/bun.lock*)
+      - name: Detect lockfile drift (lockfile source of truth)
         run: |
           echo "Checking lockfiles drift..."
-          if [ -f package-lock.json ] && [ -f pnpm-lock.yaml ]; then
-            echo "::warning::Multiple lockfiles present (npm + pnpm). Ensure single source of truth."
+          test -f package-lock.json || { echo "::error::package-lock.json is required"; exit 1; }
+          if [ -f pnpm-lock.yaml ]; then
+            echo "::warning::pnpm-lock.yaml detected; npm package-lock.json remains CI source of truth."
           fi
 
   #
@@ -156,21 +135,21 @@ jobs:
           - "packages/*"
     steps:
       - name: Hardened checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: javascript-typescript
           queries: +security-and-quality
 
       - name: Autobuild monorepo
-        uses: github/codeql-action/autobuild@v3
+        uses: github/codeql-action/autobuild@v4
 
       - name: Perform CodeQL Analysis (${{ matrix.app }})
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:javascript-typescript/${{ matrix.app }}"
 
@@ -184,21 +163,21 @@ jobs:
     needs: [deps-audit]
     steps:
       - name: Hardened checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
       - name: Validate GitHub Actions policies
         run: |
           echo "Validating workflows policy..."
-          grep -R "GITHUB_TOKEN" .github/workflows || true
+          rg "GITHUB_TOKEN" .github/workflows || true
 
       - name: Validate Supabase / Wrangler / Vercel configs
         run: |
           echo "Scanning for unsafe configurations..."
-          ! grep -R "anon-key" supabase  || (echo "::error::Supabase anon key committed"; exit 1)
-          ! grep -R "SUPABASE_" .        || true
-          ! grep -R "CF_ACCOUNT_ID" .    || true
+          ! rg "anon-key" supabase  || (echo "::error::Supabase anon key committed"; exit 1)
+          ! rg "SUPABASE_" .        || true
+          ! rg "CF_ACCOUNT_ID" .    || true
 
   #
   # 5) Telemetría y observabilidad del pipeline (cardinalidad controlada)

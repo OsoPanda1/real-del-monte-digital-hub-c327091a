@@ -188,7 +188,7 @@ export class FederationBus {
   }
 
   private handleLsmStream(_payload: unknown) {
-    // LSM: Layered Sensing Matrix (telemetría, mapa interactivo).[page:80][web:62]
+    // LSM: Layered Sensing Matrix (telemetría, mapa interactivo).
     // Aquí podrías enrutar datos hacia Supabase, Influx, etc.
     logger.info("[LSM] Stream de telemetría procesado");
   }

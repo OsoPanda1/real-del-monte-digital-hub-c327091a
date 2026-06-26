@@ -1,7 +1,7 @@
 /* RDM Digital · Theme Layer
    Estética: Editorial, cálida, territorial
    Paleta: Marfil cálido, ámbar, terracota, azul neblina
-   Inspiración: neblina serrana, minería de plata, dorados discretos[page:31]
+   Inspiración: neblina serrana, minería de plata, dorados discretos
 */
 
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap");
@@ -9,7 +9,7 @@
 /* Paleta base en HSL (sin alpha) para facilitar reutilización. */
 :root {
   /* Acentos RDM */
-  --rdm-amber: 24 72% 50%;     /* Ámbar cálido (pastes, luz dorada)[page:31] */
+  --rdm-amber: 24 72% 50%;     /* Ámbar cálido (pastes, luz dorada) */
   --rdm-terracotta: 16 65% 46%;
   --rdm-blue: 212 36% 45%;     /* Azul neblina / cielo frío */
   --rdm-green: 154 66% 36%;
@@ -128,7 +128,7 @@
   box-shadow: var(--shadow-elevated);
 }
 
-/* Pins del mapa: “joyas” sobre la montaña[page:31] */
+/* Pins del mapa: “joyas” sobre la montaña */
 
 .rdm-map-pin {
   width: 16px;
@@ -238,7 +238,7 @@
   animation: rdm-ken-burns 24s ease-in-out infinite alternate;
 }
 
-/* Variante para entradas de “Historia” (cards editoriales).[page:31] */
+/* Variante para entradas de “Historia” (cards editoriales). */
 
 .rdm-history-card {
   border-radius: var(--radius-md);
@@ -261,7 +261,7 @@
   border-color: hsl(var(--rdm-amber) / 0.38);
 }
 
-/* Botones / llamados a la acción (Apoya, Planificar Visita).[page:31] */
+/* Botones / llamados a la acción (Apoya, Planificar Visita). */
 
 .rdm-button-primary {
   display: inline-flex;

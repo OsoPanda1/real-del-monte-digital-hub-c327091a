@@ -1,7 +1,7 @@
 // RDM Digital · Sitemap XML
 // - Reemplazar BASE_URL por el dominio definitivo.
 // - Poblar entries desde el router o la BD (rutas dinámicas, slugs).
-// - Mantener lastmod en formato ISO (YYYY-MM-DD o completo con TZ).[web:70][web:77]
+// - Mantener lastmod en formato ISO (YYYY-MM-DD o completo con TZ).
 
 import type { APIContext } from "./_types";
 
@@ -18,17 +18,17 @@ type Changefreq =
 
 interface SitemapEntry {
   path: string;
-  /** ISO 8601 date/time. Idealmente la fecha real de última modificación.[web:70][web:77] */
+  /** ISO 8601 date/time. Idealmente la fecha real de última modificación. */
   lastmod?: string;
-  /** Hint para crawlers; opcional y cada vez menos relevante.[web:73][web:74][web:77] */
+  /** Hint para crawlers; opcional y cada vez menos relevante. */
   changefreq?: Changefreq;
-  /** Cadena entre 0.0 y 1.0; opcional.[web:70][web:74] */
+  /** Cadena entre 0.0 y 1.0; opcional. */
   priority?: string;
 }
 
 /**
  * Normaliza una ruta a <loc> absoluto.
- * Asegura que siempre exista una única barra entre BASE_URL y path.[web:75]
+ * Asegura que siempre exista una única barra entre BASE_URL y path.
  */
 function toAbsoluteLoc(path: string): string {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
@@ -78,7 +78,7 @@ function buildSitemapXml(entries: SitemapEntry[]): string {
  *
  * Nota:
  * - Idealmente, lastmod debería reflejar la fecha real de actualización de cada ruta.
- * - changefreq y priority son hints; Google suele ignorarlos o minimizar su peso.[web:73][web:74][web:77]
+ * - changefreq y priority son hints; Google suele ignorarlos o minimizar su peso.
  */
 export async function GET(_ctx: APIContext): Promise<Response> {
   const now = new Date().toISOString();
@@ -98,7 +98,7 @@ export async function GET(_ctx: APIContext): Promise<Response> {
   return new Response(xml, {
     headers: {
       "Content-Type": "application/xml; charset=UTF-8",
-      // Suele ser razonable cachear 1h; ajusta según frecuencia de cambios.[web:75][web:76]
+      // Suele ser razonable cachear 1h; ajusta según frecuencia de cambios.
       "Cache-Control": "public, max-age=3600",
     },
   });

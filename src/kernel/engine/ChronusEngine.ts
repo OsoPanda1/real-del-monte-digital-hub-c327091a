@@ -1,6 +1,6 @@
 import { logger } from "@/lib/logger";
 // ChronusEngine · Núcleo de gestión de presión turística para RDM Digital.
-// Contexto: Real del Monte, turismo de alta densidad, clima complejo, eventos culturales.[page:31]
+// Contexto: Real del Monte, turismo de alta densidad, clima complejo, eventos culturales.
 
 export interface QueryableDb {
   query: (
@@ -82,7 +82,7 @@ export class ChronusEngine {
 
   /**
    * Calcula la presión de saturación de una zona.
-   * Devuelve un objeto rico en lugar de un escalar opaco.[web:62]
+   * Devuelve un objeto rico en lugar de un escalar opaco.
    */
   public async calcularSaturacionZonal(
     polygonId: string,
@@ -167,7 +167,7 @@ export class ChronusEngine {
     }
   }
 
-  /** Aumenta presión si hay eventos activos (ej. festival, bicentenario).[page:31] */
+  /** Aumenta presión si hay eventos activos (ej. festival, bicentenario). */
   private calcularTensorEventos(eventos: string[]): number {
     if (!eventos.length) return 0;
 

@@ -45,7 +45,7 @@ function typedLazy<T extends ComponentType<any>>(
 }
 
 /**
- * Utilidades internas de preload — usan dynamic import a nivel de módulo.[web:52][web:56]
+ * Utilidades internas de preload — usan dynamic import a nivel de módulo.
  */
 const preloadMap = {
   Comunidad: () => import("@/pages/Comunidad"),
@@ -62,7 +62,7 @@ const preloadMap = {
 /**
  * API pública de prefetch:
  * - prefetchSurface(id): prefetch dirigido por id.
- * - prefetchByDomain(domain): prefetch por dominio lógico (ej. "social").[web:52]
+ * - prefetchByDomain(domain): prefetch por dominio lógico (ej. "social").
  */
 
 export type CommunitySurfaceId = keyof typeof preloadMap;
@@ -83,7 +83,7 @@ export function prefetchByDomain(domain: CommunitySurfaceDomain): void {
 
 /**
  * Descriptores de surfaces — una especie de “catálogo” central.
- * Esto ayuda a routers, menús, telemetría y prefetch heurístico.[web:51][web:58]
+ * Esto ayuda a routers, menús, telemetría y prefetch heurístico.
  */
 export const communitySurfaces: Record<CommunitySurfaceId, CommunitySurfaceDescriptor> = {
   Comunidad: {
@@ -146,7 +146,7 @@ export const communitySurfaces: Record<CommunitySurfaceId, CommunitySurfaceDescr
  * Entradas lazy‑loaded por surface.
  *
  * Nota:
- * - Usar con <Suspense> y, si es posible, ErrorBoundary por dominio.[web:56]
+ * - Usar con <Suspense> y, si es posible, ErrorBoundary por dominio.
  */
 
 export const Comunidad = typedLazy(

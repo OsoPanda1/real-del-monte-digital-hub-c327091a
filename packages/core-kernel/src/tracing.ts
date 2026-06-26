@@ -56,17 +56,17 @@ function secureRandom(bytes = 16): string {
   return crypto.randomBytes(bytes).toString("hex");
 }
 
-/** W3C / OTEL: 16 bytes = 32 hex chars. [web:465][web:466] */
+/** W3C / OTEL: 16 bytes = 32 hex chars.  */
 export function generateTraceId(): TraceId {
   return secureRandom(16);
 }
 
-/** W3C / OTEL: 8 bytes = 16 hex chars. [web:465][web:466] */
+/** W3C / OTEL: 8 bytes = 16 hex chars.  */
 export function generateSpanId(): SpanId {
   return secureRandom(8);
 }
 
-/** Correlation / Request IDs: independientes, pero cortos y trazables. [web:472][web:469] */
+/** Correlation / Request IDs: independientes, pero cortos y trazables.  */
 export function generateCorrelationId(): string {
   return secureRandom(12);
 }
@@ -106,7 +106,7 @@ export function attachQuantumMetadata(
 
 export interface TracingConfig {
   serviceName: string;
-  /** Base head-sampling 0–1. Errores y spans lentos se fuerzan a sampled. [web:468] */
+  /** Base head-sampling 0–1. Errores y spans lentos se fuerzan a sampled.  */
   baseSampleRate?: number;
   /** TTL para spans activos (ms). */
   activeSpanTtlMs?: number;
@@ -207,7 +207,7 @@ function hashTraceIdToRatio(traceId: string): number {
   return (hash >>> 0) / 0xffffffff;
 }
 
-/** Decisión de sampling basada solo en traceId, consistente en todos los servicios. [web:467][web:468] */
+/** Decisión de sampling basada solo en traceId, consistente en todos los servicios.  */
 function shouldSampleDeterministic(traceId: string, baseRate: number): boolean {
   if (baseRate >= 1) return true;
   if (baseRate <= 0) return false;
@@ -412,7 +412,7 @@ export function endSpan(
     span.status = "OK";
   }
 
-  // Slow spans se consideran siempre relevantes para observabilidad. [web:468]
+  // Slow spans se consideran siempre relevantes para observabilidad.
   const isSlow =
     !!span.durationMs && span.durationMs >= config.slowSpanThresholdMs;
   if (!success || error || isSlow) {
@@ -470,7 +470,7 @@ export function parseTraceParent(value: string): W3CTraceParent | null {
 
 /**
  * W3C tracestate básico para propagar correlationId entre servicios LTOS.
- * No hace parsing genérico; mantiene un vendor-key fijo "ltos". [web:466][web:464]
+ * No hace parsing genérico; mantiene un vendor-key fijo "ltos".
  */
 export function buildTraceStateFromContext(context: TraceContext): string {
   const entries = [`ltos-corr=${context.correlationId}`];
@@ -591,7 +591,7 @@ export function clearSpanExporters(): void {
 
 /**
  * Exporta un span a todos los exporters en paralelo.
- * No propaga errores de exporters al flujo principal. [web:468]
+ * No propaga errores de exporters al flujo principal.
  */
 export async function exportSpan(span: TraceSpan): Promise<void> {
   if (!span.context.sampled) return;

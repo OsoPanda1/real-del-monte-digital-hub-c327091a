@@ -41,7 +41,7 @@ const SistemasAvanzados = () => (
               <Filter className="h-5 w-5 text-primary mt-0.5 shrink-0" />
               <div>
                 <h4 className="font-semibold text-foreground text-sm">Clasificador de flujo</h4>
-                <p className="text-xs text-muted-foreground">Algoritmo de priorización basado en urgencia, tipo de dato, SLA del dominio y carga actual. Decide routing caliente vs frío en &lt;5ms.</p>
+                <p className="text-xs text-muted-foreground">Algoritmo de priorización basado en urgencia, tipo de dato, SLA del dominio y carga actual. Decide routing caliente vs frío en {"<5ms"}.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">

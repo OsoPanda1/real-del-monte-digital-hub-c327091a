@@ -759,7 +759,7 @@ export function haversineKm(a: LatLng, b: LatLng): number {
     Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
   const c = 2 * Math.asin(Math.sqrt(h));
   return R * c;
-} // [web:96][web:100][web:103]
+} //
 
 export function nearestPOIs(
   origin: LatLng,
