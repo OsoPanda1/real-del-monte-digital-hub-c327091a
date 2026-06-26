@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import introAudioSrc from "@/assets/tumirada.mp3"
+import introAudioSrc from "@/assets/legado.mp3"
 
 interface CinematicIntroProps {
   onComplete: () => void
@@ -50,6 +50,7 @@ const AudioEqualizer = ({ analyser }: { analyser: AnalyserNode | null }) => {
         const y = h - barH
 
         const grad = ctx.createLinearGradient(x, h, x, y)
+        // Oro, bronce de campana, luz de hogar
         grad.addColorStop(0, `hsla(36, 75%, 45%, ${0.3 + rawVal * 1.0})`)
         grad.addColorStop(0.6, `hsla(43, 90%, 55%, ${0.5 + rawVal * 0.5})`)
         grad.addColorStop(1, `hsla(24, 85%, 60%, ${0.2 + rawVal * 1.2})`)
@@ -237,8 +238,8 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
   const [started, setStarted] = useState(false)
   const [overlayVisible, setOverlayVisible] = useState(true)
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null)
-  const [stars] = useState<Star[]>(() => createStarField(180))
-  const [mistParticles] = useState<Particle[]>(() => createMistField(130))
+  const [stars] = useState<Star[]>(() => createStarField(190))
+  const [mistParticles] = useState<Particle[]>(() => createMistField(140))
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const audioCtxRef = useRef<AudioContext | null>(null)
@@ -353,7 +354,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
         }
       }, 120)
 
-      // Despedida suave
+      // Despedida suave al final
       setTimeout(() => {
         if (!audioRef.current) return
         fadeIntervalRef.current = window.setInterval(() => {
@@ -376,19 +377,21 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
     }
   }
 
-  // Tiempo extendido para leer y sentir
+  /**
+   * Tiempo extendido: más calma para leer y sentir
+   */
   useEffect(() => {
     if (!started) return
 
     const timers = [
-      setTimeout(() => setPhase(1), 600),
-      setTimeout(() => setPhase(2), 9500),
-      setTimeout(() => setPhase(3), 20500),
-      setTimeout(() => setPhase(4), 33000),
-      setTimeout(() => setPhase(5), 44500),
-      setTimeout(() => setPhase(6), 56000),
-      setTimeout(() => setPhase(7), 67000),
-      setTimeout(() => setPhase(8), 76000),
+      setTimeout(() => setPhase(1), 600),   // Origen y orgullo
+      setTimeout(() => setPhase(2), 9500),  // Dedicado a Reina
+      setTimeout(() => setPhase(3), 20500), // Las noches de desvelo
+      setTimeout(() => setPhase(4), 33000), // Oveja negra, logro compartido
+      setTimeout(() => setPhase(5), 44500), // Real del Monte
+      setTimeout(() => setPhase(6), 56000), // Trabajo artesanal y manos
+      setTimeout(() => setPhase(7), 67000), // Siete federaciones / legado
+      setTimeout(() => setPhase(8), 76000), // Bienvenida final
       setTimeout(() => {
         setOverlayVisible(false)
         onComplete()
@@ -406,6 +409,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
     }
   }, [stopAudio])
 
+  // Texto totalmente orientado a legado, amor, historia
   const scene = (() => {
     switch (phase) {
       case 0:
@@ -509,7 +513,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
             </motion.button>
           )}
 
-          {/* Invitación inicial */}
+          {/* Pantalla de invitación inicial */}
           {!started && (
             <motion.div
               className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-6"
@@ -559,7 +563,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
 
           {started && (
             <>
-              {/* Fondo hero dinámico */}
+              {/* Fondo de paisajes reales */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={heroIndex}
@@ -581,7 +585,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                 </motion.div>
               </AnimatePresence>
 
-              {/* Oscurecimiento íntimo */}
+              {/* Oscurecimiento íntimo para escenas familiares */}
               <motion.div
                 className="absolute inset-0 z-[1]"
                 animate={{
@@ -593,7 +597,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                 transition={{ duration: 1.5, ease: "easeInOut" }}
               />
 
-              {/* Neblina */}
+              {/* Neblina suave */}
               <div className="pointer-events-none absolute inset-0 z-[2] overflow-hidden">
                 {mistParticles.map((pt) => (
                   <motion.div
@@ -620,7 +624,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                 ))}
               </div>
 
-              {/* Estrellas danzando alrededor del texto */}
+              {/* Estrellas que danzan alrededor del texto */}
               <div className="pointer-events-none absolute inset-0 z-[3] overflow-hidden">
                 {stars.map((star) => {
                   const orbitFactor =
@@ -683,7 +687,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                 />
               </div>
 
-              {/* Anillos suaves */}
+              {/* Anillos suaves rodeando el centro */}
               <motion.div
                 className="pointer-events-none absolute inset-0 z-[4] flex items-center justify-center"
                 initial={{ opacity: 0 }}
@@ -829,7 +833,7 @@ const CinematicIntro = ({ onComplete }: CinematicIntroProps) => {
                 </p>
               </motion.div>
 
-              {/* Imágenes inferiores */}
+              {/* Imágenes inferiores: vida cotidiana del pueblo */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={phase >= 5 ? { opacity: 1, y: 0 } : {}}
