@@ -26,7 +26,7 @@ import ReactMarkdown from "react-markdown";
 import { useAudioPlayer, type Track } from "@/contexts/AudioPlayerContext";
 
 const PLAYLIST: Track[] = [
-  { id: "legado", title: "Legado de Real del Monte", artist: "RDM Digital", description: "Tema principal del proyecto. Una travesía sonora por calles empedradas, niebla eterna y el latir minero del Pueblo Mágico.", src: legadoMp3, duration: 200, bpm: 80, mood: "Épico" },
+  { id: "A mi madre", title: "Legado de Real del Monte", artist: "RDM Digital", description: "Homenaje musical a mi madre, al amor incondicional y al sacrificio silencioso.", src: reinatrejoMp3, duration: 275, bpm: 70, mood: "Emotivo" },
   { id: "tumirada", title: "Tu Mirada", artist: "RDM Digital", description: "Melodía íntima que captura la esencia de una mirada que lo dice todo.", src: tumiradaMp3, duration: 240, bpm: 72, mood: "Melancólico" },
   { id: "a_mimadre", title: "A Mi Madre (Legend)", artist: "Edwin Castillo", description: "Homenaje musical a la madre, al amor incondicional y al sacrificio silencioso.", src: aMimadreMp3, duration: 210, bpm: 70, mood: "Emotivo" },
   { id: "adicted_toyou", title: "Adicted to You", artist: "Edwin Castillo", description: "Canción que explora la adicción emocional que nace del corazón y se niega a soltar.", src: adictedToyouMp3, duration: 220, bpm: 85, mood: "Pasional" },
