@@ -29,6 +29,14 @@ interface Song {
   created_at: string;
 }
 
+const MOCK_SONGS: Song[] = [
+  { id: "mock-1", title: "Legado de Real del Monte", artist: "RDM Digital", description: "Tema principal del proyecto", storage_path: "legado.mp3", mime_type: "audio/mpeg", duration_seconds: 180, size_bytes: 4800000, created_at: "2025-01-01" },
+  { id: "mock-2", title: "Mirada de Plata", artist: "RDM Digital", description: "Melodía inspirada en la minería", storage_path: "tumirada.mp3", mime_type: "audio/mpeg", duration_seconds: 240, size_bytes: 5800000, created_at: "2025-01-02" },
+  { id: "mock-3", title: "Neblina en el Monte", artist: "Isabella Villaseñor", description: "Paisaje sonoro del pueblo mágico", storage_path: "neblina.mp3", mime_type: "audio/mpeg", duration_seconds: 200, size_bytes: 5200000, created_at: "2025-01-03" },
+  { id: "mock-4", title: "Paste y Tradición", artist: "RDM Digital", description: "Ritmos de la cocina tradicional", storage_path: "paste.mp3", mime_type: "audio/mpeg", duration_seconds: 160, size_bytes: 4100000, created_at: "2025-01-04" },
+  { id: "mock-5", title: "Canto de las Antiguas", artist: "Coro Comunitario", description: "Canto tradicional de las minas", storage_path: "canto.mp3", mime_type: "audio/mpeg", duration_seconds: 300, size_bytes: 7200000, created_at: "2025-01-05" },
+];
+
 function formatDuration(secs: number | null): string {
   if (!secs) return "--:--";
   const m = Math.floor(secs / 60);
@@ -265,8 +273,18 @@ export default function Musica() {
       .eq("is_public", true)
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
-        if (error) setError(error.message);
-        else setSongs((data ?? []) as Song[]);
+        if (error) {
+          setError(error.message);
+          setSongs(MOCK_SONGS);
+        } else if (data && data.length > 0) {
+          setSongs(data as Song[]);
+        } else {
+          setSongs(MOCK_SONGS);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setSongs(MOCK_SONGS);
         setLoading(false);
       });
   }, []);

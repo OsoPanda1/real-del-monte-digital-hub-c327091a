@@ -9,6 +9,7 @@ import { PAGE_SEO, SEOMeta } from "@/components/SEOMeta";
 import { Link } from "react-router-dom";
 import { Map2DPanel } from "@/components/map/Map2DPanel";
 import { MapSyncProvider, useMapSync } from "@/hooks/useMapSync";
+import MapErrorBoundary from "@/components/MapErrorBoundary";
 import type { MapMarkerData, MarkerType } from "@/features/places/mapTypes";
 import { buildRecommendedActions, buildTwinOverlaySummary, synthesizeTwinSignals } from "@/features/twins/hybridTwin";
 
@@ -248,27 +249,29 @@ function MapaPageContent() {
                 </div>
               </div>
 
-              <div className="overflow-hidden rounded-2xl border border-white/10">
-                {mode === "2d" ? (
-                  <Map2DPanel
-                    markers={filtered}
-                    selected={selected}
-                    viewport={viewport}
-                    onSelect={setSelected}
-                    onViewportChange={syncFrom2D}
-                  />
-                ) : (
-                  <Suspense
-                    fallback={
-                      <div className="flex h-[420px] items-center justify-center bg-[hsl(var(--muted)/0.5)] text-sm text-[hsl(var(--muted-foreground))] md:h-[640px]">
-                        Cargando Gemelo Digital 3D...
-                      </div>
-                    }
-                  >
-                    <Map3DTwin viewport={viewport} markers={filtered} onViewportChange={syncFrom3D} />
-                  </Suspense>
-                )}
-              </div>
+              <MapErrorBoundary>
+                <div className="overflow-hidden rounded-2xl border border-white/10">
+                  {mode === "2d" ? (
+                    <Map2DPanel
+                      markers={filtered}
+                      selected={selected}
+                      viewport={viewport}
+                      onSelect={setSelected}
+                      onViewportChange={syncFrom2D}
+                    />
+                  ) : (
+                    <Suspense
+                      fallback={
+                        <div className="flex h-[420px] items-center justify-center bg-[hsl(var(--muted)/0.5)] text-sm text-[hsl(var(--muted-foreground))] md:h-[640px]">
+                          Cargando Gemelo Digital 3D...
+                        </div>
+                      }
+                    >
+                      <Map3DTwin viewport={viewport} markers={filtered} onViewportChange={syncFrom3D} />
+                    </Suspense>
+                  )}
+                </div>
+              </MapErrorBoundary>
             </div>
 
             <aside className="space-y-4 lg:col-span-4">

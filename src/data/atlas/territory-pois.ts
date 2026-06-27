@@ -4,7 +4,7 @@
 // Combina POIs canónicos + entidades narrativas (minas, pastes, calles, leyendas, rutas, eventos)
 // + utilidades geoespaciales y filtros para IA, juegos, dashboards y RDM Digital.
 
-import type { FederationId } from "./rdmFederations";
+import type { FederationId } from "./federations";
 
 const minasImg = "/placeholder.svg";
 const pastesImg = "/placeholder.svg";
