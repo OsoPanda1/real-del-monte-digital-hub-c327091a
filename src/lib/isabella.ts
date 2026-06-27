@@ -17,7 +17,6 @@ import {
   applyDecisionToHeptafederation,
   getGlobalHealth,
   getTelemetry,
-  getFederationStats,
 } from './heptafederation';
 
 // ============================================================================
@@ -175,13 +174,13 @@ export function registrarFeedback(
  */
 export function getSystemStatus(): {
   orchestratorStats: ReturnType<ExperienceOrchestrator['getStats']>;
-  federationStats: ReturnType<typeof getFederationStats>;
+  federationHealth: number;
   systemMetrics: ReturnType<typeof getSystemMetrics>;
   placesCount: number;
 } {
   return {
     orchestratorStats: orchestrator.getStats(),
-    federationStats: getFederationStats(),
+    federationHealth: getGlobalHealth(),
     systemMetrics: getSystemMetrics(),
     placesCount: getAllPlaces().length,
   };
@@ -221,7 +220,6 @@ export {
   getAllPlaces,
   getGlobalHealth,
   getTelemetry,
-  getFederationStats,
 };
 
 export type {

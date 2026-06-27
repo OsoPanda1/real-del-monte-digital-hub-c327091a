@@ -349,6 +349,27 @@ export function updateLocalFederation(
 }
 
 // ============================================================================
+// INTEGRACION CON FEDERATIONBUS (F1-F7 TAMV)
+// ============================================================================
+
+import { federationBus } from "@/federaciones/FederationBus";
+import type { FederationModule as FedBusModule, FederationId as FedBusId } from "@/core/models";
+
+export function getFederationBusModules(): FedBusModule[] {
+  return federationBus.getAllFederations();
+}
+
+export function getFederationBusModule(id: FedBusId): FedBusModule | undefined {
+  return federationBus.getFederation(id);
+}
+
+export function getFederationBusHealth(): number {
+  const feds = federationBus.getAllFederations();
+  if (!feds.length) return 0;
+  return Math.round(feds.reduce((sum, f) => sum + f.health, 0) / feds.length * 100) / 100;
+}
+
+// ============================================================================
 // EXPORTACIONES
 // ============================================================================
 

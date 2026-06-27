@@ -1,4 +1,8 @@
 import { ChronusEngine, type PublishClient, type QueryableDb } from './engine/ChronusEngine';
+import { MDX5Kernel } from './engine/MDX5Kernel';
+import { timeUpEngine } from './engine/TimeUpEngine';
+import { ledger } from './engine/Ledger';
+import { federationBus } from "@/federaciones/FederationBus";
 import { logger } from "@/lib/logger";
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -20,7 +24,10 @@ if (!databaseUrl || !redisUrl) {
   logger.warn('[KERNEL] DATABASE_URL y REDIS_URL no configurados. Se usará modo mock local.');
 }
 
-const chronus = new ChronusEngine(mockDb, mockPubSub);
+const chronus = new ChronusEngine({ db: mockDb, pubsub: mockPubSub });
+export const mdx5 = new MDX5Kernel({ pollIntervalMs: 1000 }, chronus, federationBus);
+
+mdx5.start();
 
 setInterval(async () => {
   try {
@@ -34,4 +41,23 @@ setInterval(async () => {
   }
 }, 60_000);
 
-logger.info('[KERNEL] Chronus-Real activo en modo soberano edge-first.');
+logger.info('[KERNEL] MD-X5 activo en modo soberano edge-first.');
+logger.info('[KERNEL] TIME UP engine cargado con', { politicas: 10 });
+logger.info('[KERNEL] Ledger listo para registrar acciones críticas');
+
+export { chronus, timeUpEngine, ledger };
+
+export function submitIntent(
+  type: string,
+  payload: unknown,
+  source: string,
+  priority: 'low' | 'normal' | 'high' | 'critical' = 'normal',
+): string {
+  return mdx5.submit({
+    type,
+    payload,
+    source,
+    priority,
+    federation: undefined,
+  });
+}
