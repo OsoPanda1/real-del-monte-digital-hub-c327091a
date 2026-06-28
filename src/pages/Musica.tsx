@@ -20,7 +20,14 @@ import ReactMarkdown from "react-markdown"
 import { useAudioPlayer, type Track } from "@/contexts/AudioPlayerContext"
 import playlistMd from "@/assets/musica/playlist.md?raw"
 
-// Ajusta esto a tus URLs R2 normalizadas
+// Paleta base (comentarios para referencia visual)
+// navy blue dark:      #0b1020
+// azul petróleo negro: #050814
+// azul eléctrico metal: #00D4FF
+// verde limón:         #A7F300
+// rojo cereza:         #FF1744
+// platino:             #E5E7EB
+
 const R2_BASE = "https://media.visitarealdelmonte.online"
 
 const PLAYLIST: Track[] = [
@@ -137,7 +144,6 @@ const PLAYLIST: Track[] = [
     bpm: 72,
     mood: "Melancólico",
   },
-  // añade el resto de tus pistas R2 aquí…
 ]
 
 const DONATION_AMOUNTS = [50, 100, 200, 500, 1000]
@@ -149,7 +155,7 @@ function formatDuration(secs: number): string {
 }
 
 /* ------------------------------------------------------------------ */
-/*  TRACK ROW ESTILO SPOTIFY / APPLE                                  */
+/*  TRACK ROW ESTILO STREAMING                                         */
 /* ------------------------------------------------------------------ */
 
 function TrackRow({
@@ -168,15 +174,23 @@ function TrackRow({
   const [expanded, setExpanded] = useState(false)
   const open = expanded || (isActive && isPlaying)
 
+  // Colores de mood (verde limón / rojo cereza / azul eléctrico)
+  const moodColor =
+    track.mood === "Triste" || track.mood === "Intenso"
+      ? "#FF1744" // rojo cereza
+      : track.mood === "Energético" || track.mood === "Épico"
+      ? "#00D4FF" // azul eléctrico
+      : "#A7F300" // verde limón por defecto
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.03 }}
-      className={`group rounded-xl border transition-all duration-200 will-change-transform will-change-opacity ${
+      className={`group rounded-2xl border transition-all duration-200 will-change-transform will-change-opacity ${
         isActive
-          ? "border-[#00D4FF]/40 bg-[#020617]/70 shadow-[0_19px_40px_rgba(0,212,255,0.25)]"
-          : "border-white/5 bg-[#020617]/50 hover:border-[#00D4FF]/30 hover:bg-[#020617]/80 hover:shadow-[0_19px_28px_rgba(10,22,40,0.35)]"
+          ? "border-[#00D4FF] bg-[#F3F4F6] shadow-[0_12px_35px_rgba(0,212,255,0.35)]"
+          : "border-[#E5E7EB] bg-white hover:border-[#00D4FF]/70 hover:shadow-[0_10px_30px_rgba(11,18,32,0.15)]"
       }`}
     >
       <button
@@ -187,14 +201,16 @@ function TrackRow({
         className="w-full flex items-center gap-3 px-3 py-2.5 text-left"
       >
         {/* index / playing */}
-        <div className="relative shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-[#0b1220]/80">
+        <div className="relative shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-[#050814]">
           {isActive && isPlaying ? (
             <span className="flex gap-px items-end h-3.5">
               {[1, 2, 3].map((b) => (
                 <span
                   key={b}
-                  className="w-[3px] bg-gradient-to-t from-[#00D4FF] to-cyan-300 rounded-full animate-bounce"
+                  className="w-[3px] rounded-full animate-bounce"
                   style={{
+                    background:
+                      "linear-gradient(to top, #00D4FF, #A7F300)",
                     height: `${5 + b * 3}px`,
                     animationDelay: `${b * 0.42}s`,
                   }}
@@ -202,7 +218,7 @@ function TrackRow({
               ))}
             </span>
           ) : (
-            <span className="text-[10px] font-semibold text-gray-500 group-hover:opacity-0 transition-opacity">
+            <span className="text-[10px] font-semibold text-[#1F2937] group-hover:opacity-0 transition-opacity">
               {String(index + 1).padStart(2, "0")}
             </span>
           )}
@@ -216,23 +232,30 @@ function TrackRow({
           <div className="flex items-center gap-2">
             <span
               className={`text-sm font-semibold truncate ${
-                isActive ? "text-[#E5F4FF]" : "text-gray-100"
+                isActive ? "text-[#0b1020]" : "text-[#0b1020]"
               }`}
             >
               {track.title}
             </span>
             {track.mood && (
-              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#00D4FF]/10 text-[#00D4FF]/80 uppercase tracking-[0.18em] shrink-0 hidden sm:inline">
+              <span
+                className="text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-[0.18em] shrink-0 hidden sm:inline"
+                style={{
+                  backgroundColor: `${moodColor}15`,
+                  color: moodColor,
+                  border: `1px solid ${moodColor}55`,
+                }}
+              >
                 {track.mood}
               </span>
             )}
           </div>
-          <p className="text-[11px] text-gray-400">{track.artist}</p>
+          <p className="text-[11px] text-[#24304f]">{track.artist}</p>
         </div>
 
         {/* Duration + controls */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-[11px] text-dark-navyblue-400 tabular-nums">
+          <span className="text-[11px] text-[#4B5563] tabular-nums">
             {formatDuration(track.duration)}
           </span>
           <button
@@ -242,8 +265,8 @@ function TrackRow({
             }}
             className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all will-change-transform will-change-opacity ${
               isActive
-                ? "bg-[#00D4FF]/18 text-[#00D4FF]"
-                : "text-gray-400 hover:text-[#00D4FF] hover:bg-[#00D4FF]/10"
+                ? "bg-[#00D4FF]/15 text-[#00D4FF]"
+                : "text-[#4B5563] hover:text-[#00D4FF] hover:bg-[#00D4FF]/10"
             }`}
           >
             {isActive && isPlaying ? (
@@ -259,14 +282,14 @@ function TrackRow({
             }}
             className={`p-1 transition-transform duration-200 ${
               open ? "rotate-180" : ""
-            } text-gray-500 hover:text-gray-300`}
+            } text-[#9CA3AF] hover:text-[#374151]`}
           >
             <ChevronDown className="w-4 h-4" />
           </button>
         </div>
       </button>
 
-      {/* Expanded details estilo Apple Music */}
+      {/* Expanded details */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -276,11 +299,11 @@ function TrackRow({
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="px-3 pb-3 pt-0 border-t border-white/5 mt-1">
-              <p className="text-[12px] text-gray-300 leading-relaxed mb-2 mt-2">
+            <div className="px-3 pb-3 pt-0 border-t border-[#E5E7EB] mt-1">
+              <p className="text-[12px] text-[#1c2540] leading-relaxed mb-2 mt-2">
                 {track.description}
               </p>
-              <div className="flex flex-wrap items-center gap-3 text-[10px] text-gray-400">
+              <div className="flex flex-wrap items-center gap-3 text-[10px] text-[#4B5563]">
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   {formatDuration(track.duration)}
@@ -314,10 +337,14 @@ function TrackRow({
 function ActiveProgressBar() {
   const { progress } = useAudioPlayer()
   return (
-    <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
+    <div className="mt-2 h-1.5 rounded-full bg-[#E5E7EB] overflow-hidden">
       <div
-        className="h-full bg-gradient-to-r from-[#00D4FF] via-[#0088FF] to-[#00D4FF] rounded-full transition-[width] duration-250"
-        style={{ width: `${progress * 100}%` }}
+        className="h-full rounded-full transition-[width] duration-250"
+        style={{
+          width: `${progress * 100}%`,
+          background:
+            "linear-gradient(90deg, #FF1744, #00D4FF, #A7F300)",
+        }}
       />
     </div>
   )
@@ -337,10 +364,10 @@ function NowPlayingBadge() {
         <Disc3 className="w-4 h-4 text-[#00D4FF]" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-gray-400">
-          {isPlaying ? "Reproduciendo ahora" : "Paused"}
+        <p className="text-[11px] uppercase tracking-[0.22em] text-[#4B5563]">
+          {isPlaying ? "Reproduciendo ahora" : "Pausado"}
         </p>
-        <p className="text-[12px] text-gray-100 truncate">
+        <p className="text-[12px] text-[#0b1020] truncate">
           {currentTrack.title} • {currentTrack.artist}
         </p>
       </div>
@@ -349,7 +376,7 @@ function NowPlayingBadge() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  PAGE: Música streaming híbrido                                     */
+/*  PAGE: Música streaming híbrido sobre fondo blanco                  */
 /* ------------------------------------------------------------------ */
 
 export default function Musica() {
@@ -388,22 +415,23 @@ export default function Musica() {
         description="Archivo histórico musical del Pueblo Mágico. Melodías que capturan el espíritu de Real del Monte. Apoya con una donación."
       />
 
-      <section className="relative pt-24 pb-12 px-6 md:px-16 overflow-hidden">
-        {/* Fondo tipo app de música */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#020617] via-[#0b1020] to-[#1a0f0a]" />
-        <div
-          className="absolute inset-0 -z-10 opacity-40"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 20% 0%, rgba(0,212,255,0.35) 0%, transparent 55%), " +
-              "radial-gradient(circle at 80% 30%, rgba(252,165,165,0.18) 0%, transparent 50%), " +
-              "radial-gradient(circle at 50% 80%, rgba(0,100,200,0.12) 0%, transparent 45%)",
-          }}
-        />
+      {/* Fondo blanco + halo superior de color */}
+      <section className="relative pt-24 pb-12 px-6 md:px-16 overflow-hidden bg-white">
+        <div className="absolute inset-x-0 top-0 h-40 -z-10">
+          <div
+            className="h-full w-full"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle at 10% 0%, rgba(0,212,255,0.25) 0%, transparent 55%), " +
+                "radial-gradient(circle at 90% 0%, rgba(255,23,68,0.20) 0%, transparent 55%), " +
+                "linear-gradient(to bottom, rgba(5,8,20,0.06), transparent)",
+            }}
+          />
+        </div>
 
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-10">
-            {/* Header tipo playlist Apple/Spotify */}
+            {/* Header tipo playlist */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -411,41 +439,48 @@ export default function Musica() {
             >
               <div className="flex items-start gap-6">
                 {/* Cover card */}
-                <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-gradient-to-br from-[#00D4FF]/25 via-[#0f172a] to-[#111827] border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] flex items-center justify-center overflow-hidden">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_0%,rgba(0,212,255,0.35)_0%,transparent_55%)] opacity-70" />
-                  <Disc3 className="w-14 h-14 md:w-16 md:h-16 text-[#E5F4FF]" />
+                <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-2xl bg-[#050814] border border-[#111827] shadow-[0_20px_45px_rgba(5,8,20,0.45)] flex items-center justify-center overflow-hidden">
+                  <div
+                    className="absolute inset-0 opacity-70"
+                    style={{
+                      backgroundImage:
+                        "radial-gradient(circle at 30% 0%, rgba(0,212,255,0.5) 0%, transparent 55%), " +
+                        "radial-gradient(circle at 80% 100%, rgba(167,243,0,0.35) 0%, transparent 55%)",
+                    }}
+                  />
+                  <Disc3 className="w-14 h-14 md:w-16 md:h-16 text-white" />
                 </div>
 
                 {/* Playlist info */}
                 <div className="flex-1">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-[#00D4FF]/20 bg-[#00D4FF]/8 px-4 py-1.5 text-[9px] uppercase tracking-[0.25em] text-gray-400 mb-3">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[#00D4FF] bg-[#00D4FF]/10 px-4 py-1.5 text-[9px] uppercase tracking-[0.25em] text-[#0b1020] mb-3">
                     <Sparkles className="h-3 w-3 text-[#00D4FF]" />
                     <span>Archivo Histórico Musical</span>
                   </div>
                   <h1
-                    className="text-[1.9rem] md:text-[2.7rem] font-bold text-gray-100 tracking-tight"
+                    className="text-[1.9rem] md:text-[2.7rem] font-bold text-[#0b1020] tracking-tight"
                     style={{ fontFamily: "var(--font-display)" }}
                   >
                     Música de Real del Monte
                   </h1>
-                  <p className="mt-2 text-[13px] text-gray-300 max-w-md">
+                  <p className="mt-2 text-[13px] text-[#1c2540] max-w-md">
                     Una colección viva de canciones que narran la historia, el amor y la memoria del
                     Pueblo Mágico. Diseñado como un archivo sonoro, disponible siempre para todos.
                   </p>
 
-                  <div className="mt-4 flex flex-wrap items-center gap-3 text-[11px] text-gray-400">
+                  <div className="mt-4 flex flex-wrap items-center gap-3 text-[11px] text-[#4B5563]">
                     <span className="flex items-center gap-2">
-                      <Award className="w-3.5 h-3.5 text-[#00D4FF]/60" />
+                      <Award className="w-3.5 h-3.5 text-[#00D4FF]" />
                       {PLAYLIST.length} pistas
                     </span>
-                    <span className="w-1 h-1 rounded-full bg-[#00D4FF]/25" />
+                    <span className="w-1 h-1 rounded-full bg-[#E5E7EB]" />
                     <span className="flex items-center gap-2">
-                      <Clock className="w-3.5 h-3.5 text-[#00D4FF]/60" />
+                      <Clock className="w-3.5 h-3.5 text-[#00D4FF]" />
                       {formatDuration(totalDuration)}
                     </span>
-                    <span className="w-1 h-1 rounded-full bg-[#00D4FF]/25" />
+                    <span className="w-1 h-1 rounded-full bg-[#E5E7EB]" />
                     <span className="flex items-center gap-2">
-                      <Download className="w-3.5 h-3.5 text-[#00D4FF]/60" />
+                      <Download className="w-3.5 h-3.5 text-[#00D4FF]" />
                       Descarga libre
                     </span>
                   </div>
@@ -459,24 +494,24 @@ export default function Musica() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
-                className="mt-6 p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md"
+                className="mt-6 p-4 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB]"
               >
                 <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#00D4FF]/10 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-[#00D4FF]/12 flex items-center justify-center shrink-0">
                     <BookOpen className="w-4 h-4 text-[#00D4FF]" />
                   </div>
-                  <div className="prose prose-sm max-w-none text-gray-200 text-[13px]">
-                    <ReactMarkdown>{playlistMd}</ReactMarkdown>
-                  </div>
+                </div>
+                <div className="prose prose-sm max-w-none text-[#1c2540] text-[13px] mt-2">
+                  <ReactMarkdown>{playlistMd}</ReactMarkdown>
                 </div>
               </motion.div>
             </motion.div>
 
-            {/* Lista de tracks + donaciones en columna derecha */}
+            {/* Lista de tracks + donaciones */}
             <div className="flex-1 flex flex-col gap-8">
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] uppercase tracking-[0.22em] text-gray-500">
+                  <span className="text-[10px] uppercase tracking-[0.22em] text-[#9CA3AF]">
                     Catálogo sonoro
                   </span>
                 </div>
@@ -500,7 +535,7 @@ export default function Musica() {
                   ))}
                 </div>
 
-                {/* Download all (usa una pista representativa o zip cuando lo tengas) */}
+                {/* Descargar todo */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -510,7 +545,7 @@ export default function Musica() {
                   <a
                     href={`${R2_BASE}/legado_1.mp3`}
                     download="Legado_de_Real_del_Monte.mp3"
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] text-gray-300 hover:text-[#00D4FF] hover:bg-[#00D4FF]/10 transition-all"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] text-[#4B5563] hover:text-[#00D4FF] hover:bg-[#00D4FF]/10 transition-all"
                   >
                     <Download className="w-3.5 h-3.5" />
                     Descargar todo (.zip próximamente)
@@ -518,30 +553,30 @@ export default function Musica() {
                 </motion.div>
               </div>
 
-              {/* Donaciones estilo card premium */}
+              {/* Donaciones */}
               <motion.div
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
-                className="rounded-2xl overflow-hidden border border-[#00D4FF]/25 bg-gradient-to-br from-[#020617] via-[#0b1020] to-[#1a0f0a] shadow-[0_22px_60px_rgba(0,212,255,0.35)] backdrop-blur-xl"
+                className="rounded-2xl overflow-hidden border border-[#E5E7EB] bg-[#F3F4F6] shadow-[0_16px_40px_rgba(15,23,42,0.15)]"
               >
                 <div className="relative h-28 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#00D4FF]/20 via-transparent to-[#fb7185]/15" />
                   <div
-                    className="absolute inset-0 opacity-25"
+                    className="absolute inset-0"
                     style={{
                       backgroundImage:
-                        "radial-gradient(circle at 35% 40%, rgba(0,212,255,0.4) 0%, transparent 60%), " +
-                        "radial-gradient(circle at 72% 60%, rgba(248,113,113,0.4) 0%, transparent 55%)",
+                        "linear-gradient(120deg, rgba(0,212,255,0.22), rgba(255,23,68,0.18), rgba(167,243,0,0.20))",
                     }}
                   />
-                  <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#020617] to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#F3F4F6] to-transparent" />
                   <div className="absolute bottom-4 left-6 flex items-center gap-3">
-                    <Heart className="w-7 h-7 text-[#E5F4FF]" />
+                    <Heart className="w-7 h-7 text-[#050814]" />
                     <div>
-                      <h3 className="text-sm font-bold text-gray-100">Apoya esta música</h3>
-                      <p className="text-[11px] text-gray-300">
+                      <h3 className="text-sm font-bold text-[#0b1020]">
+                        Apoya esta música
+                      </h3>
+                      <p className="text-[11px] text-[#24304f]">
                         Tu donación mantiene vivo este archivo sonoro.
                       </p>
                     </div>
@@ -549,7 +584,7 @@ export default function Musica() {
                 </div>
 
                 <div className="px-6 pb-6 pt-4">
-                  <p className="text-[13px] text-gray-300 leading-relaxed mb-5">
+                  <p className="text-[13px] text-[#1c2540] leading-relaxed mb-5">
                     Esta música es y será siempre gratuita. Pero mantener servidores, dominio y el
                     desarrollo de RDM Digital requiere inversión constante. Si este proyecto resuena
                     contigo, considera hacer una contribución.
@@ -607,8 +642,8 @@ function DonationControls({
             }}
             className={`relative px-5 py-2.5 rounded-xl text-sm font-bold transition-all will-change-transform will-change-opacity ${
               donationAmount === amount
-                ? "bg-gradient-to-br from-[#00D4FF] to-[#0088FF] text-white shadow-lg shadow-[#00D4FF]/35 scale-105"
-                : "bg-white/5 border border-white/10 text-gray-200 hover:bg-white/10 hover:text-[#00D4FF]"
+                ? "bg-gradient-to-br from-[#00D4FF] to-[#FF1744] text-white shadow-lg shadow-[#00D4FF]/35 scale-105"
+                : "bg-white border border-[#E5E7EB] text-[#0b1020] hover:bg-[#F3F4F6] hover:text-[#00D4FF]"
             }`}
           >
             ${amount.toLocaleString()}
@@ -627,9 +662,11 @@ function DonationControls({
       </div>
 
       <div className="flex items-center gap-3 mb-6">
-        <span className="text-[11px] text-gray-400 shrink-0">Otra cantidad:</span>
+        <span className="text-[11px] text-[#4B5563] shrink-0">
+          Otra cantidad:
+        </span>
         <div className="relative flex-1 max-w-[200px]">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-semibold">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7280] text-sm font-semibold">
             $
           </span>
           <input
@@ -641,16 +678,16 @@ function DonationControls({
               setCustomAmount(e.target.value)
               setDonationAmount(null)
             }}
-            className="w-full pl-7 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-100 text-sm focus:outline-none focus:border-[#00D4FF]/60 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="w-full pl-7 pr-4 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-[#0b1020] text-sm focus:outline-none focus:border-[#00D4FF] transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
         </div>
-        <span className="text-[11px] text-gray-500">MXN</span>
+        <span className="text-[11px] text-[#6B7280]">MXN</span>
       </div>
 
       <button
         onClick={onDonate}
         disabled={donating || (!donationAmount && !customAmount)}
-        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-3.5 rounded-xl bg-gradient-to-br from-[#00D4FF] to-[#0088FF] text-white font-bold text-sm hover:opacity-90 hover:scale-[1.02] disabled:opacity-40 disabled:scale-100 transition-all shadow-xl shadow-[#00D4FF]/25 will-change-transform will-change-opacity"
+        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-3.5 rounded-xl bg-gradient-to-br from-[#00D4FF] via-[#FF1744] to-[#A7F300] text-white font-bold text-sm hover:opacity-90 hover:scale-[1.02] disabled:opacity-40 disabled:scale-100 transition-all shadow-xl shadow-[#00D4FF]/25 will-change-transform will-change-opacity"
       >
         {donating ? (
           <>
@@ -666,7 +703,7 @@ function DonationControls({
         )}
       </button>
 
-      <p className="mt-3 text-[9px] text-gray-500 leading-relaxed">
+      <p className="mt-3 text-[9px] text-[#6B7280] leading-relaxed">
         <ExternalLink className="w-3 h-3 inline mr-1" />
         Pago procesado vía Stripe. No almacenamos datos bancarios.
       </p>
