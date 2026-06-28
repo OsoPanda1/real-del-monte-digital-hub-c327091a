@@ -26,31 +26,13 @@ pages_build_output_dir = "dist"
 # URL matches the canonical domain before completing. Any deploy to a non-canonical
 # URL MUST be treated as a security incident.
 
-# --- Production environment ----------------------------------------------
-[env.production]
-name = "rdm-digital-ltos"
-
-[env.production.vars]
-VITE_APP_ENV = "production"
-
-# NOTA: Los dominios personalizados (www.visitarealdelmonte.online) se
-# configuran en el Dashboard de Cloudflare Pages, NO en wrangler.toml.
+# NOTA: Los dominios personalizados y variables de entorno se configuran en
+# el Dashboard de Cloudflare Pages, NO en wrangler.toml.
 # Ir a: Cloudflare Dashboard > Pages > rdm-digital-ltos > Custom domains
+#       Cloudflare Dashboard > Pages > rdm-digital-ltos > Environment variables
 
-# Secrets (do NOT put values here):
-#   wrangler pages secret put SUPABASE_SERVICE_ROLE_KEY --project-name rdm-digital-ltos
-#   wrangler pages secret put GEMINI_API_KEY            --project-name rdm-digital-ltos
-#   wrangler pages secret put TURNSTILE_SECRET_KEY      --project-name rdm-digital-ltos
-#   wrangler pages secret put SENTRY_DSN                --project-name rdm-digital-ltos
-
-# --- Preview environment -------------------------------------------------
-[env.preview]
-name = "rdm-digital-ltos-preview"
-
-[env.preview.vars]
-VITE_APP_ENV = "preview"
-
-# Preview routes se asignan automaticamente por Cloudflare Pages (xxx.pages.dev)
-
-# Preview deployments are ALLOWED only via Cloudflare Pages preview URLs.
-# Vercel preview deployments are DISABLED (see vercel.json redirects).
+# Variables de entorno REQUERIDAS en Cloudflare Dashboard:
+#   VITE_APP_ENV = "production"           (production)
+#   VITE_APP_ENV = "preview"              (preview)
+#   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
+#   STRIPE_SECRET_KEY (opcional), VITE_POSTHOG_KEY (opcional), VITE_SENTRY_DSN (opcional)
