@@ -120,6 +120,7 @@ const AtlasMaximus = lazy(() => import('./pages/AtlasMaximus'))
 const EcosistemaLTOS = lazy(() => import('./pages/EcosistemaLTOS'))
 const Perfil = lazy(() => import('./pages/Perfil'))
 const Leaderboard = lazy(() => import('./pages/Leaderboard'))
+const TerritorialDashboard = lazy(() => import('./pages/TerritorialDashboard'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -265,6 +266,7 @@ const AnimatedRoutes = () => {
           <Route path="/atlas" element={<RouteErrorBoundary route="/atlas"><Atlas /></RouteErrorBoundary>} />
           <Route path="/devhub" element={<RouteErrorBoundary route="/devhub"><DevHub /></RouteErrorBoundary>} />
           <Route path="/feed" element={<RouteErrorBoundary route="/feed"><Feed /></RouteErrorBoundary>} />
+          <Route path="/territorial-dashboard" element={<RouteErrorBoundary route="/territorial-dashboard"><TerritorialDashboard /></RouteErrorBoundary>} />
           <Route path="/estacionamientos" element={<RouteErrorBoundary route="/estacionamientos"><Estacionamientos /></RouteErrorBoundary>} />
           <Route path="/patrimonio-cultural" element={<RouteErrorBoundary route="/patrimonio-cultural"><PatrimonioCultural /></RouteErrorBoundary>} />
           <Route path="/capitulos" element={<RouteErrorBoundary route="/capitulos"><AtlasCapitulos /></RouteErrorBoundary>} />

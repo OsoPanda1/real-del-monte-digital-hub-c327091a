@@ -166,6 +166,7 @@ export async function GET(_ctx: APIContext): Promise<Response> {
     { path: "/atlas", lastmod: now, changefreq: "weekly", priority: "0.7" },
     { path: "/devhub", lastmod: now, changefreq: "weekly", priority: "0.6" },
     { path: "/feed", lastmod: now, changefreq: "weekly", priority: "0.5" },
+    { path: "/territorial-dashboard", lastmod: now, changefreq: "weekly", priority: "0.7" },
 
     // Turismo
     { path: "/estacionamientos", lastmod: now, changefreq: "weekly", priority: "0.6" },

@@ -45,3 +45,20 @@ export const paymentsApi = {
       body: JSON.stringify(data),
     }),
 }
+
+export const newsletterApi = {
+  subscribe: (data: { email: string; source?: string; name?: string }) =>
+    request<{ success: boolean; message: string }>("/newsletter/subscribe", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  unsubscribe: (email: string) =>
+    request<{ success: boolean; message: string }>("/newsletter/unsubscribe", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
+  check: (email: string) =>
+    request<{ success: boolean; data: { subscribed: boolean } }>(
+      `/newsletter/check?email=${encodeURIComponent(email)}`,
+    ),
+}
