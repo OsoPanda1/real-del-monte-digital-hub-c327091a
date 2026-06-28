@@ -1,10 +1,10 @@
 // src/App.tsx
 
-import { useState, useCallback, lazy, Suspense } from 'react'
+import { useState, useCallback, useEffect, lazy, Suspense } from 'react'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AnimatePresence } from 'framer-motion'
 import ErrorBoundary from '@/components/ErrorBoundary'
@@ -141,6 +141,9 @@ const queryClient = new QueryClient({
   },
 })
 
+// Isabella AI — fusión territorial al arranque
+import { fusionEngine } from '@/core/territorial/TerritorialFusionEngine'
+
 // Fallback visible y accesible para loads de rutas
 const RouteFallback = () => (
   <div
@@ -226,6 +229,8 @@ const AnimatedRoutes = () => {
           <Route path="/comercios/panel" element={<RouteErrorBoundary route="/comercios/panel"><ComerciosPanel /></RouteErrorBoundary>} />
           <Route path="/mapa-vivo" element={<RouteErrorBoundary route="/mapa-vivo"><MapaVivo /></RouteErrorBoundary>} />
           <Route path="/registro-comercio" element={<RouteErrorBoundary route="/registro-comercio"><RegistroComercio /></RouteErrorBoundary>} />
+          <Route path="/gemelo" element={<Navigate to="/mapa-vivo" replace />} />
+          <Route path="/contacto" element={<Navigate to="/quienes-somos" replace />} />
           <Route path="/introduccion" element={<RouteErrorBoundary route="/introduccion"><Introduccion /></RouteErrorBoundary>} />
           <Route path="/filosofia" element={<RouteErrorBoundary route="/filosofia"><Filosofia /></RouteErrorBoundary>} />
           <Route path="/arquitectura" element={<RouteErrorBoundary route="/arquitectura"><Arquitectura /></RouteErrorBoundary>} />
@@ -287,6 +292,13 @@ const AppInner = () => {
 
   const handleIntroComplete = useCallback(() => {
     setIntroComplete(true)
+  }, [])
+
+  // Arranque de Isabella AI al montar la app
+  useEffect(() => {
+    const isBrowser = typeof window !== 'undefined'
+    if (!isBrowser) return
+    fusionEngine.start()
   }, [])
 
   const [showIntro] = useState(() => {

@@ -7,7 +7,7 @@
 ---
 
 > **Despliegue activo:** [www.visitarealdelmonte.online](https://www.visitarealdelmonte.online)
-> **Versión:** GEN-8.0 — Heptafederación Cuántica · Pipeline Hexagonal de Conciencia · Kernel MD-X5
+> **Versión:** GEN-8.0 — Heptafederación Cuántica · Pipeline Hexagonal de Conciencia · Kernel MD-X5 · Isabella AI Activa · LDTOCS · Connect Nativo
 
 ---
 
@@ -233,7 +233,7 @@ src/
 │   │   ├── types.ts              — Tipos: contribuciones, zonas, stats
 │   │   ├── TerritorialDataCollector.ts — Colector con listeners y heatmap
 │   │   ├── TerritorialGeofencer.ts     — 6 zonas de Real del Monte
-│   │   ├── TerritorialFusionEngine.ts  — Orquestador central
+│   │   ├── TerritorialFusionEngine.ts  — Orquestador central (arranca Isabella)
 │   │   └── index.ts
 │   │
 │   ├── unified/                  ← SISTEMA UNIFICADO GEN-8.0
@@ -244,6 +244,13 @@ src/
 │   │   ├── UnifiedSDK.ts         — API única para desarrolladores
 │   │   └── index.ts
 │   │
+│   ├── twins/                    ← GEMELOS DIGITALES LDTOCS
+│   │   ├── types.ts              — Tipos JSON-LD: MeshNode, Commerce, Sensor
+│   │   ├── topics.ts             — Constantes topic naming (Zenoh/MQTT)
+│   │   ├── micro-sentinel.ts     — Validación firma/física/política en borde
+│   │   ├── ditto.ts              — Config Eclipse Ditto (Policy, Thing, Connection)
+│   │   └── index.ts
+│   │
 │   ├── engine/ScoringEngine.ts   — Score contextual (V2)
 │   ├── orchestrator/ExperienceOrchestrator.ts — Orquestador V2
 │   ├── ai/isabella-guardian.ts   — Decisiones adaptativas antifrágiles
@@ -252,7 +259,7 @@ src/
 │   ├── metrics/prometheus.ts     — 19+ métricas Prometheus
 │   └── models.ts                 — Modelos base
 │
-├── isabella/                     ← ISABELLA VILLASEÑOR AI
+├── isabella/                     ← ISABELLA VILLASEÑOR AI (ACTIVA AL ARRANQUE)
 │   ├── core/
 │   │   ├── identity.ts           — Identidad digital
 │   │   ├── oath.ts               — Juramento (6 principios inmutables)
@@ -281,8 +288,15 @@ src/
 │   │
 │   └── api/index.ts              — API facade
 │
+├── connect/                      ← CONEXIÓN NATIVA VERCELL-STYLE (ANUBIS + PHOENIX)
+│   ├── types.ts                  — ConnectSubject, ConnectorConfig, TokenRecord
+│   ├── TokenVault.ts             — issue/verify/revoke tokens con hash
+│   ├── ConnectorRegistry.ts      — Registro de conectores, stats
+│   ├── TriggerRouter.ts          — Destinos de triggers, forward de eventos
+│   └── index.ts
+│
 ├── federaciones/
-│   ├── FederationBus.ts          — Bus de eventos F1-F7
+│   ├── FederationBus.ts          — Bus de eventos F1-F7 (con getHealth)
 │   └── territorial-federation-bridge.ts — Puente federación-territorio
 │
 ├── kernel/engine/
@@ -300,14 +314,28 @@ src/
 │   └── ShutdownProtocol.ts       — Apagado 5 etapas
 │
 ├── lib/
+│   ├── health/                   ← HEALTH API
+│   │   ├── index.ts              — HealthService con timeout + status agregado
+│   │   └── ...
 │   ├── kernel.ts                 — 15 POIs, 6 intents, narrativas
 │   ├── heptafederation.ts        — Health checks, stats, federaciones locales
 │   └── isabella.ts               — Facade GEN-7+ legacy
 │
-└── app/api/unified/              ← API ROUTES
-    ├── state/route.ts            — GET estado, POST acciones
-    ├── contribute/route.ts       — POST contribuciones
-    └── query/route.ts            — POST consultas a Isabella
+├── components/
+│   └── map/
+│       └── TwinNodeVisualizer.tsx  ← Visualizador 3D gemelos (color + emisión)
+│
+├── app/api/
+│   ├── health/route.ts           ← GET /api/health (db, consc., bus, memoria, guardian)
+│   └── unified/                  ← API ROUTES
+│       ├── state/route.ts        — GET estado, POST acciones
+│       ├── contribute/route.ts   — POST contribuciones
+│       └── query/route.ts        — POST consultas a Isabella
+│
+├── tests/
+│   └── integration/              ← 7 pruebas de integración (skills, guardian, health, connect, territorial, bus, consciousness)
+│
+└── e2e/                          ← 2 pruebas E2E (isabella-flow, territorial-journey)
 ```
 
 ---
@@ -420,28 +448,36 @@ src/
 | **Supabase Integration** | 85% | 🔷 Producción | Auth, RLS, 32+ tablas, edge functions |
 | **Migraciones SQL** | 100% | ✅ Producción | 10 migraciones, PostGIS, RLS policies |
 | **DevOps (CI/CD)** | 72% | 🟡 Mejora | CI sólido; CD pendiente, blue/green |
-| **Testing** | 65% | 🟡 Mejora | Unit tests; falta integration, e2e, load |
+| **Testing** | 75% | 🔷 Producción | 17 tests (7 integración, 2 E2E); Vitest + Playwright |
+| **Connect Nativo (ANUBIS+PHOENIX)** | 100% | ✅ Producción | TokenVault, ConnectorRegistry, TriggerRouter, eventos FederationBus |
+| **Health API** | 100% | ✅ Producción | GET /api/health, HealthService con timeout y status agregado |
+| **LDTOCS Gemelos Digitales** | 100% | ✅ Producción | Tipos JSON-LD, topics Zenoh/MQTT, Micro-Sentinel, Ditto config |
+| **TwinNodeVisualizer** | 100% | ✅ Producción | Three.js shader 3D con color meshHealth + emisión adoptionIndex |
+| **Lint** | 100% | ✅ 0 errores | ESLint flat config, 0 errores, 22 warnings |
+| **TypeScript** | 100% | ✅ 0 errores | strict mode, 0 errores de tipo |
 | **Documentación** | 85% | 🔷 Producción | README completo, docs técnicos, manual |
 
 ### Progreso General
 
 ```
 Sistema Base:       ████████████████████ 100%  ✅
-Isabella AI:        ████████████████████ 100%  ✅
+Isabella AI:        ████████████████████ 100%  ✅ (Activa al arranque)
 Heptafederación:    ████████████████████ 100%  ✅
 Pipeline Hexagonal: ████████████████████ 100%  ✅
 Sistema Unificado:  ████████████████████ 100%  ✅
 Territorial:        ████████████████████ 100%  ✅
+Connect Nativo:     ████████████████████ 100%  ✅
+LDTOCS Gemelos:     ████████████████████ 100%  ✅
 Seguridad:          ██████████████████░░  90%  🔷
 Knowledge:          ██████████████████░░  90%  🔷
 Blockchain:         ████████████████░░░░  80%  🔷
 Redes Externas:     ████████████████░░░░  80%  🔷
 Frontend:           ██████████████████░░  85%  🔷
-Testing:            █████████████░░░░░░░  65%  🟡
+Testing:            ████████████████░░░░  75%  🔷
 DevOps:             ███████████████░░░░░  72%  🟡
-Documentación:      ██████████████████░░  85%  🔷
+Lint + TypeScript:  ████████████████████ 100%  ✅ (0 errores)
 
-GLOBAL:             ██████████████████░░  88%  🟢
+GLOBAL:             ██████████████████░░  89%  🟢
 ```
 
 ---
@@ -462,22 +498,35 @@ GLOBAL:             ██████████████████░░
 - [x] External Networks Connector (Twitter/Discord/Telegram/Instagram/TikTok)
 - [x] Despliegue en www.visitarealdelmonte.online
 
-### 🟡 FASE 4-5 — EN PROGRESO
+### 🟢 FASE 4 — COMPLETADA
+- [x] Isabella AI activa al arranque (fusionEngine.start() en App.tsx)
+- [x] Connect Nativo (ANUBIS + PHOENIX): TokenVault, ConnectorRegistry, TriggerRouter
+- [x] Health API: GET /api/health con status agregado por componente
+- [x] LDTOCS Gemelos Digitales: tipos JSON-LD, topics Zenoh/MQTT, Micro-Sentinel, Ditto
+- [x] TwinNodeVisualizer: shader 3D con feedback de salud/adopción
+- [x] Lint: 0 errores (ESLint flat config, 22 warnings)
+- [x] TypeScript: 0 errores (strict mode)
+- [x] Testing: 17 tests (7 integración, 2 E2E)
+- [x] Sitemap actualizado con 80+ rutas reales
+- [x] Merge a origin/main consolidado
+
+### 🟡 FASE 5 — EN PROGRESO
 - [~] CATTLEYA + Stripe: Monetización, membresías, economía digital
 - [~] OpenTofu IaC: Infraestructura como código para Nodo Cero
 - [~] SSI Identity Verification real (SovereignIdentity funcional)
 - [~] Conexión SSE route al FederationBus real
 - [ ] Eliminar duplicación: lib/api.ts vs lib/api/index.ts
-- [ ] npm run typecheck y build verification continua
+- [ ] Cobertura de tests >80%
+- [ ] Integración Micro-Sentinel con FederationBus datos reales
+- [ ] Datos de ejemplo para gemelos digitales (node, commerce, sensor)
 
 ### 🔵 FASE 6-7 — FUTURO
 - [ ] CD pipeline: staging/producción con blue-green deployment
-- [ ] Testing: cobertura >80% (unit, integration, contract, load, chaos)
 - [ ] Dashboard federado público en visitarealdelmonte.online/federacion
 - [ ] App móvil nativa (React Native) para check-ins offline
 - [ ] Mesh networking LoRa/Meshtastic para zonas sin cobertura
 - [ ] Mercado de NFTs culturales (BookPI + MSR Blockchain)
-- [ ] Gemelo digital en tiempo real con WebGL/Three.js
+- [ ] Gemelo digital en tiempo real con datos IoT vía Ditto/MQTT
 
 ---
 
