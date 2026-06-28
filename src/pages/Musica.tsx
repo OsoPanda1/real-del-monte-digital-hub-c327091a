@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { RDMLayout } from "@/components/rdm/RDMLayout";
 import { SEOMeta } from "@/components/SEOMeta";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Play, Pause, Download, Heart, Clock,
   Headphones, Disc3,
-  Sparkles, Award, BookOpen, ExternalLink
+  Sparkles, Award, BookOpen, ExternalLink, ChevronDown
 } from "lucide-react";
 
 import legadoMp3 from "@/assets/legado.mp3";
@@ -44,86 +44,125 @@ const PLAYLIST: Track[] = [
 
 const DONATION_AMOUNTS = [50, 100, 200, 500, 1000];
 
-const MOOD_COLORS: Record<string, string> = {
-  "Épico": "from-amber-500/20 to-red-500/30",
-  "Melancólico": "from-blue-500/40 to-indigo-500/10",
-  "Ambiental": "from-emerald-500/20 to-teal-500/10",
-  "Festivo": "from-orange-500/50 to-yellow-500/10",
-  "Ceremonial": "from-violet-500/30 to-purple-500/10",
-};
-
-const platinumText = "text-[#E5E4E2]";
-const platinumDim = "text-[#E5E4E2]/60";
-const electricBlue = "#00D4FF";
-const electricBlueBorder = "border-[#00D4FF]";
-const electricBlueGlow = "shadow-[0_0_15px_rgba(0,212,255,0.3)]";
-
 function formatDuration(secs: number): string {
   const m = Math.floor(secs / 60);
   const s = secs % 60;
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-function TrackCard({ track, index, isActive, isPlaying, onPlay }: {
+function CompactTrack({ track, index, isActive, isPlaying, onPlay }: {
   track: Track; index: number; isActive: boolean; isPlaying: boolean; onPlay: () => void;
 }) {
+  const [expanded, setExpanded] = useState(false);
+  const open = expanded || (isActive && isPlaying);
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.07 }}
-      onClick={onPlay}
-      className={`group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-500 border ${
+      transition={{ delay: index * 0.04 }}
+      className={`rounded-xl border transition-all duration-200 ${
         isActive
-          ? "bg-gradient-to-br from-[hsl(var(--rdm-amber)/0.12)] to-transparent border-[hsl(var(--rdm-amber)/0.35)] shadow-lg shadow-[hsl(var(--rdm-amber)/0.08)]"
-          : "bg-white/65 hover:bg-white/90 border-transparent hover:border-[hsl(var(--rdm-amber)/0.19)] hover:shadow-md"
+          ? "border-[#00D4FF]/40 bg-[#00D4FF]/5 shadow-sm shadow-[#00D4FF]/10"
+          : "border-gray-200/80 bg-white hover:border-[#00D4FF]/30 hover:shadow-sm"
       }`}
     >
-      <div className="p-5">
-        <div className="flex items-start gap-4">
-          <div className="relative shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-[#00D4FF]/20 to-[#0a0e1a] flex items-center justify-center border border-[#00D4FF]/20">
-            {isActive && isPlaying ? (
-              <span className="flex gap-px items-end h-5">
-                {[1, 2, 3].map(b => (
-                  <span key={b} className="w-1 bg-gradient-to-t from-[hsl(var(--rdm-amber))] to-amber-300 rounded-full animate-bounce" style={{ height: `${8 + b * 5}px`, animationDelay: `${b * 0.42}s` }} />
-                ))}
-              </span>
-            ) : (
-              <>
-                <span className="text-[11px] font-bold text-[#E5E4E2]/40 group-hover:hidden">{String(index + 1).padStart(2, "0")}</span>
-                <Play className="w-5 h-5 text-[#00D4FF] hidden group-hover:block" />
-              </>
+      {/* Header bar — always visible */}
+      <button
+        onClick={() => {
+          if (isActive) {
+            onPlay();
+          } else {
+            onPlay();
+            setExpanded(true);
+          }
+        }}
+        className="w-full flex items-center gap-3 px-3 py-2.5 text-left"
+      >
+        {/* Number + play icon */}
+        <div className="relative shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-[#00D4FF]/10 to-[#0a0e1a]/5 flex items-center justify-center border border-[#00D4FF]/10">
+          {isActive && isPlaying ? (
+            <span className="flex gap-px items-end h-3.5">
+              {[1, 2, 3].map(b => (
+                <span key={b} className="w-[3px] bg-gradient-to-t from-[#00D4FF] to-cyan-300 rounded-full animate-bounce" style={{ height: `${5 + b * 3}px`, animationDelay: `${b * 0.42}s` }} />
+              ))}
+            </span>
+          ) : (
+            <>
+              <span className="text-[10px] font-bold text-gray-400 group-hover:hidden">{String(index + 1).padStart(2, "0")}</span>
+              <Play className="w-3.5 h-3.5 text-[#00D4FF] hidden" />
+            </>
+          )}
+        </div>
+
+        {/* Title + artist */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className={`text-sm font-semibold truncate ${isActive ? "text-[#00D4FF]" : "text-gray-900"}`}>
+              {track.title}
+            </span>
+            {track.mood && (
+              <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-[#00D4FF]/10 text-[#00D4FF]/70 uppercase tracking-wider shrink-0 hidden sm:inline">{track.mood}</span>
             )}
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5">
-              <h3 className={`text-sm font-bold truncate ${isActive ? "text-[#00D4FF]" : "text-[#E5E4E2]"}`}>
-                {track.title}
-              </h3>
-              {track.mood && (
-                <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-[#00D4FF]/10 text-[#00D4FF]/80 uppercase tracking-wider shrink-0">{track.mood}</span>
+          <p className="text-[11px] text-gray-500">{track.artist}</p>
+        </div>
+
+        {/* Duration */}
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[11px] text-gray-400 tabular-nums">{formatDuration(track.duration)}</span>
+          <button
+            onClick={e => { e.stopPropagation(); onPlay(); }}
+            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
+              isActive ? "bg-[#00D4FF]/15 text-[#00D4FF]" : "text-gray-400 hover:text-[#00D4FF] hover:bg-[#00D4FF]/10"
+            }`}
+          >
+            {isActive && isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+          </button>
+          <button
+            onClick={e => { e.stopPropagation(); setExpanded(!expanded); }}
+            className={`p-1 transition-transform duration-200 ${open ? "rotate-180" : ""} text-gray-300 hover:text-gray-500`}
+          >
+            <ChevronDown className="w-4 h-4" />
+          </button>
+        </div>
+      </button>
+
+      {/* Expanded details */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="px-3 pb-3 pt-0 border-t border-gray-100 mt-1">
+              <p className="text-[12px] text-gray-600 leading-relaxed mb-2 mt-2">{track.description}</p>
+              <div className="flex items-center gap-4 text-[10px] text-gray-400">
+                <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDuration(track.duration)}</span>
+                {track.bpm && <span className="flex items-center gap-1"><Headphones className="w-3 h-3" />{track.bpm} BPM</span>}
+                {track.mood && <span className="flex items-center gap-1"><Disc3 className="w-3 h-3" />{track.mood}</span>}
+              </div>
+              {/* Progress bar for active track */}
+              {isActive && (
+                <ActiveProgressBar />
               )}
             </div>
-            <p className="text-[11px] text-[#E5E4E2]/50 mb-1.5">{track.artist}</p>
-            <p className="text-[10px] text-[#E5E4E2]/40 leading-relaxed line-clamp-2">{track.description}</p>
-            <div className="flex items-center gap-3 mt-2 text-[9px] text-[#E5E4E2]/30">
-              <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-[#00D4FF]/50" />{formatDuration(track.duration)}</span>
-              {track.bpm && <span className="flex items-center gap-1"><Headphones className="w-3 h-3 text-[#00D4FF]/50" />{track.bpm} BPM</span>}
-            </div>
-          </div>
-          <div className="shrink-0 self-center">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-              isActive ? "bg-[#00D4FF]/20" : "bg-transparent group-hover:bg-[#00D4FF]/10"
-            }`}>
-              <Play className={`w-4 h-4 transition-colors ${isActive ? "text-[#00D4FF]" : "text-[#E5E4E2]/40 group-hover:text-[#00D4FF]"}`} />
-            </div>
-          </div>
-        </div>
-      </div>
-      {isActive && (
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#00D4FF] to-[#0088FF]" style={{ boxShadow: "0 0 10px rgba(0,212,255,0.5)" }} />
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
+  );
+}
+
+function ActiveProgressBar() {
+  const { progress } = useAudioPlayer();
+  return (
+    <div className="mt-2 h-1 rounded-full bg-gray-100 overflow-hidden">
+      <div className="h-full bg-gradient-to-r from-[#00D4FF] to-[#0088FF] rounded-full transition-all duration-300" style={{ width: `${progress * 100}%` }} />
+    </div>
   );
 }
 
@@ -132,8 +171,6 @@ export default function Musica() {
   const [donationAmount, setDonationAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState("");
   const [donating, setDonating] = useState(false);
-
-  const activeIdx = currentTrack ? PLAYLIST.findIndex(t => t.id === currentTrack.id) : -1;
 
   const handleDonation = async () => {
     const amount = donationAmount ?? (customAmount ? parseInt(customAmount) : null);
@@ -158,7 +195,7 @@ export default function Musica() {
       <SEOMeta title="Archivo Histórico Musical — RDM Digital" description="Archivo histórico musical del Pueblo Mágico. Melodías que capturan el espíritu de Real del Monte. Apoya con una donación." />
 
       {/* Hero */}
-      <section className="relative pt-28 pb-20 px-6 md:px-16 overflow-hidden">
+      <section className="relative pt-28 pb-16 px-6 md:px-16 overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#0a0e1a] via-[#0d1225] to-[#1a0f0a]" />
         <div className="absolute inset-0 -z-10 opacity-30"
           style={{ backgroundImage: "radial-gradient(circle at 15% 45%, rgba(0,212,255,0.2) 0%, transparent 60%), radial-gradient(circle at 85% 30%, rgba(0,212,255,0.1) 0%, transparent 50%), radial-gradient(circle at 50% 80%, rgba(0,100,200,0.1) 0%, transparent 40%)" }}
@@ -173,27 +210,27 @@ export default function Musica() {
             <Disc3 className="w-12 h-12 text-[#00D4FF]" />
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#00D4FF]/20 bg-[#00D4FF]/5 px-4 py-1.5 text-[9px] uppercase tracking-[0.25em] text-[#E5E4E2]/60 mb-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#00D4FF]/20 bg-[#00D4FF]/5 px-4 py-1.5 text-[9px] uppercase tracking-[0.25em] text-gray-400 mb-4">
               <Sparkles className="h-3 w-3 text-[#00D4FF]" />
               <span>Archivo Histórico Musical</span>
             </div>
-            <h1 className="text-[2.85rem] md:text-[4.75rem] lg:text-[5.7rem] font-bold text-[#E5E4E2] mb-4 tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
+            <h1 className="text-[2.85rem] md:text-[4.75rem] lg:text-[5.7rem] font-bold text-gray-100 mb-4 tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
               Música de
               <br />
               <span className="text-[#00D4FF]" style={{ textShadow: "0 0 20px rgba(0,212,255,0.5)" }}>Real del Monte</span>
             </h1>
-            <p className="text-[#E5E4E2]/50 text-sm md:text-base max-w-xl mx-auto leading-relaxed">
+            <p className="text-gray-400 text-sm md:text-base max-w-xl mx-auto leading-relaxed">
               Melodías que capturan el alma del Pueblo Mágico. Una selección curada por el equipo RDM Digital para despertar el amor por nuestro territorio.
             </p>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
             className="flex flex-wrap items-center justify-center gap-3 mt-8"
           >
-            <span className="flex items-center gap-2 text-[#E5E4E2]/30 text-[11px]"><Award className="w-3.5 h-3.5 text-[#00D4FF]/60" />{PLAYLIST.length} tracks</span>
+            <span className="flex items-center gap-2 text-gray-500 text-[11px]"><Award className="w-3.5 h-3.5 text-[#00D4FF]/60" />{PLAYLIST.length} tracks</span>
             <span className="w-1 h-1 rounded-full bg-[#00D4FF]/20" />
-            <span className="flex items-center gap-2 text-[#E5E4E2]/30 text-[11px]"><Clock className="w-3.5 h-3.5 text-[#00D4FF]/60" />{formatDuration(PLAYLIST.reduce((a: number, t: Track) => a + t.duration, 0))}</span>
+            <span className="flex items-center gap-2 text-gray-500 text-[11px]"><Clock className="w-3.5 h-3.5 text-[#00D4FF]/60" />{formatDuration(PLAYLIST.reduce((a: number, t: Track) => a + t.duration, 0))}</span>
             <span className="w-1 h-1 rounded-full bg-[#00D4FF]/20" />
-            <span className="flex items-center gap-2 text-[#E5E4E2]/30 text-[11px]"><Download className="w-3.5 h-3.5 text-[#00D4FF]/60" />Descarga libre</span>
+            <span className="flex items-center gap-2 text-gray-500 text-[11px]"><Download className="w-3.5 h-3.5 text-[#00D4FF]/60" />Descarga libre</span>
           </motion.div>
         </div>
       </section>
@@ -202,31 +239,31 @@ export default function Musica() {
       <section className="py-8 px-6 md:px-16 pb-40">
         <div className="max-w-3xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="flex items-center gap-3 mb-8"
+            className="flex items-center gap-3 mb-6"
           >
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#00D4FF]/20 to-transparent" />
-            <span className="text-[9px] uppercase tracking-[0.3em] text-[#E5E4E2]/30 font-semibold">Catálogo Sonoro</span>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#00D4FF]/20 to-transparent" />
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+            <span className="text-[9px] uppercase tracking-[0.3em] text-gray-400 font-semibold">Catálogo Sonoro</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
           </motion.div>
 
           {/* Playlist manifesto from playlist.md */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-            className="mb-10 p-6 rounded-2xl bg-[#00D4FF]/5 border border-[#00D4FF]/10 backdrop-blur-sm"
+            className="mb-6 p-4 rounded-xl bg-gray-50 border border-gray-200"
           >
-            <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-xl bg-[#00D4FF]/10 flex items-center justify-center shrink-0">
-                <BookOpen className="w-5 h-5 text-[#00D4FF]" />
+            <div className="flex gap-3">
+              <div className="w-8 h-8 rounded-lg bg-[#00D4FF]/10 flex items-center justify-center shrink-0">
+                <BookOpen className="w-4 h-4 text-[#00D4FF]" />
               </div>
-              <div className="prose prose-invert prose-sm max-w-none text-[#E5E4E2]/70">
+              <div className="prose prose-sm max-w-none text-gray-700 text-[13px]">
                 <ReactMarkdown>{playlistMd}</ReactMarkdown>
               </div>
             </div>
           </motion.div>
 
-          {/* Track cards */}
-          <div className="space-y-3">
+          {/* Compact track list */}
+          <div className="space-y-1.5">
             {PLAYLIST.map((track, idx) => (
-              <TrackCard
+              <CompactTrack
                 key={track.id}
                 track={track}
                 index={idx}
@@ -245,24 +282,23 @@ export default function Musica() {
 
           {/* Download all */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
-            className="mt-6 flex justify-end"
+            className="mt-4 flex justify-end"
           >
             <a href={legadoMp3} download="Legado_de_Real_del_Monte.mp3"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] text-[#E5E4E2]/40 hover:text-[#00D4FF] hover:bg-[#00D4FF]/5 transition-all"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] text-gray-400 hover:text-[#00D4FF] hover:bg-[#00D4FF]/5 transition-all"
             >
               <Download className="w-3.5 h-3.5" /> Descargar todo (.zip próximamente)
             </a>
           </motion.div>
 
-          {/* ── Donation Section ── */}
+          {/* Donation Section */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.15 }}
-            className="mt-16 rounded-[2rem] overflow-hidden border border-[#00D4FF]/20 bg-gradient-to-br from-[#0a0e1a] via-[#0d1225] to-[#1a0f0a] shadow-2xl"
+            className="mt-12 rounded-[2rem] overflow-hidden border border-[#00D4FF]/20 bg-gradient-to-br from-[#0a0e1a] via-[#0d1225] to-[#1a0f0a] shadow-2xl"
           >
-            {/* Visual top */}
             <div className="relative h-32 overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-[#00D4FF]/10 to-transparent" />
               <div className="absolute inset-0 opacity-20"
@@ -272,19 +308,18 @@ export default function Musica() {
               <div className="absolute bottom-6 left-8 flex items-center gap-3">
                 <Heart className="w-8 h-8 text-[#00D4FF]" />
                 <div>
-                  <h3 className="text-lg font-bold text-[#E5E4E2]">Apoya esta música</h3>
-                  <p className="text-[11px] text-[#E5E4E2]/40">Tu donación mantiene viva la plataforma</p>
+                  <h3 className="text-lg font-bold text-gray-100">Apoya esta música</h3>
+                  <p className="text-[11px] text-gray-400">Tu donación mantiene viva la plataforma</p>
                 </div>
               </div>
             </div>
 
             <div className="px-8 pb-8">
-              <p className="text-[13px] text-[#E5E4E2]/50 leading-relaxed mb-6 max-w-lg">
+              <p className="text-[13px] text-gray-400 leading-relaxed mb-6 max-w-lg">
                 Esta música es y será siempre gratuita. Pero mantener los servidores, el dominio y el desarrollo de RDM Digital tiene un costo real.
                 Elige una cantidad y haz tu donación ahora.
               </p>
 
-              {/* Amount selector */}
               <div className="flex flex-wrap gap-3 mb-5">
                 {DONATION_AMOUNTS.map(amount => (
                   <button
@@ -293,7 +328,7 @@ export default function Musica() {
                     className={`relative px-6 py-3 rounded-xl text-sm font-bold transition-all ${
                       donationAmount === amount
                         ? "bg-gradient-to-br from-[#00D4FF] to-[#0088FF] text-white shadow-lg shadow-[#00D4FF]/30 scale-105"
-                        : "bg-[#00D4FF]/5 border border-[#00D4FF]/10 text-[#E5E4E2]/60 hover:bg-[#00D4FF]/10 hover:text-[#00D4FF] hover:border-[#00D4FF]/30"
+                        : "bg-[#00D4FF]/5 border border-[#00D4FF]/10 text-gray-400 hover:bg-[#00D4FF]/10 hover:text-[#00D4FF] hover:border-[#00D4FF]/30"
                     }`}
                   >
                     ${amount.toLocaleString()}
@@ -303,24 +338,22 @@ export default function Musica() {
                 ))}
               </div>
 
-              {/* Custom amount */}
               <div className="flex items-center gap-3 mb-6">
-                <span className="text-[11px] text-[#E5E4E2]/30 shrink-0">Otra cantidad:</span>
+                <span className="text-[11px] text-gray-500 shrink-0">Otra cantidad:</span>
                 <div className="relative flex-1 max-w-[200px]">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#E5E4E2]/40 text-sm font-semibold">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-semibold">$</span>
                   <input
                     type="number"
                     min={1}
                     placeholder="0"
                     value={customAmount}
                     onChange={e => { setCustomAmount(e.target.value); setDonationAmount(null); }}
-                    className="w-full pl-7 pr-4 py-2.5 rounded-xl bg-[#00D4FF]/5 border border-[#00D4FF]/10 text-[#E5E4E2] text-sm focus:outline-none focus:border-[#00D4FF]/50 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full pl-7 pr-4 py-2.5 rounded-xl bg-[#00D4FF]/5 border border-[#00D4FF]/10 text-gray-100 text-sm focus:outline-none focus:border-[#00D4FF]/50 transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
-                <span className="text-[11px] text-[#E5E4E2]/20">MXN</span>
+                <span className="text-[11px] text-gray-600">MXN</span>
               </div>
 
-              {/* Donate button */}
               <button
                 onClick={handleDonation}
                 disabled={donating || (!donationAmount && !customAmount)}
@@ -336,7 +369,7 @@ export default function Musica() {
                 )}
               </button>
 
-              <p className="mt-4 text-[9px] text-[#E5E4E2]/20 leading-relaxed">
+              <p className="mt-4 text-[9px] text-gray-600 leading-relaxed">
                 <ExternalLink className="w-3 h-3 inline mr-1" />
                 Pago procesado vía Stripe. No almacenamos datos bancarios.
               </p>
@@ -348,12 +381,12 @@ export default function Musica() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="mt-8 p-5 rounded-2xl bg-[#00D4FF]/[0.02] border border-[#00D4FF]/5"
+            className="mt-6 p-4 rounded-xl bg-gray-50/50 border border-gray-200"
           >
             <div className="flex gap-3">
-              <BookOpen className="w-5 h-5 text-[#00D4FF]/20 shrink-0 mt-0.5" />
-              <div className="prose prose-invert prose-xs max-w-none text-[#E5E4E2]/40">
-                <p className="text-[11px] font-semibold text-[#E5E4E2]/40 mb-1">Manifiesto</p>
+              <BookOpen className="w-4 h-4 text-gray-300 shrink-0 mt-0.5" />
+              <div className="prose prose-sm max-w-none text-gray-600">
+                <p className="text-[11px] font-semibold text-gray-400 mb-1">Manifiesto</p>
                 <ReactMarkdown>{playlistMd}</ReactMarkdown>
               </div>
             </div>
