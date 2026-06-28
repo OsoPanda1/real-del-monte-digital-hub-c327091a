@@ -175,8 +175,8 @@ function TrackRow({
       transition={{ delay: index * 0.03 }}
       className={`group rounded-xl border transition-all duration-200 will-change-transform will-change-opacity ${
         isActive
-          ? "border-[#00D4FF]/40 bg-[#020617]/70 shadow-[0_12px_40px_rgba(0,212,255,0.25)]"
-          : "border-white/5 bg-[#020617]/50 hover:border-[#00D4FF]/30 hover:bg-[#020617]/80 hover:shadow-[0_10px_28px_rgba(10,22,40,0.35)]"
+          ? "border-[#00D4FF]/40 bg-[#020617]/70 shadow-[0_19px_40px_rgba(0,212,255,0.25)]"
+          : "border-white/5 bg-[#020617]/50 hover:border-[#00D4FF]/30 hover:bg-[#020617]/80 hover:shadow-[0_19px_28px_rgba(10,22,40,0.35)]"
       }`}
     >
       <button
@@ -232,7 +232,7 @@ function TrackRow({
 
         {/* Duration + controls */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-[11px] text-gray-400 tabular-nums">
+          <span className="text-[11px] text-dark-navyblue-400 tabular-nums">
             {formatDuration(track.duration)}
           </span>
           <button
