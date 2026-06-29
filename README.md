@@ -9,6 +9,7 @@
 
 > **Despliegue activo:** [www.visitarealdelmonte.online](https://www.visitarealdelmonte.online)
 > **Versión:** GEN-8.0 — Heptafederación Cuántica · Pipeline Hexagonal de Conciencia · Kernel MD-X5 · Isabella AI Activa · LDTOCS · Connect Nativo
+> **Build:** Vite 8 + Rolldown/Oxc · React 18 · Tailwind CSS 3 · Supabase · Sentry · PostHog
 
 ---
 
@@ -396,17 +397,17 @@ src/
 
 | Capa | Tecnología |
 |------|-----------|
-| **Frontend** | React 18, Vite, Radix UI, Tailwind CSS, shadcn/ui, Framer Motion, Lucide |
-| **Backend** | Node.js / TypeScript, Next.js App Router |
+| **Frontend** | React 18, Vite 8 + Rolldown/Oxc, Radix UI, Tailwind CSS 3, shadcn/ui, Framer Motion 12, Lucide |
+| **Backend** | Node.js / TypeScript, Supabase Edge Functions, Next.js App Router |
 | **Base de datos** | Supabase (PostgreSQL + PostGIS), Auth, RLS, Storage, Edge Functions |
-| **Infraestructura** | Vercel (CI/CD), Cloudflare (DNS, CDN, Workers) |
-| **IA y Conciencia** | Isabella AI (10 capas), MotorConciencia, KnowledgeAbsorptionEngine |
-| **Seguridad** | PQC Kyber-1024, AES-256-GCM, SHA3-512, zk-SNARKs |
+| **Infraestructura** | Vercel (CI/CD, build), Cloudflare (DNS, CDN, DDoS), GitHub Actions (CI) |
+| **IA y Conciencia** | Isabella AI (10 capas), MotorConciencia, KnowledgeAbsorptionEngine, Google Gemini |
+| **Seguridad** | PQC Kyber-1024, AES-256-GCM, SHA3-512, InputValidation anti-SQLi/XSS, CSP estricto |
 | **Blockchain** | Polygon, MSR (Minería Soberana Real), Ethereum, BSC |
-| **Observabilidad** | Prometheus, OpenTelemetry-ready, W3C Trace Context |
+| **Observabilidad** | Sentry (errores), PostHog (analytics), Prometheus (métricas), OpenTelemetry-ready |
 | **Gobernanza** | TIME UP (10 políticas), Ledger SHA-256, Sovereign Identity (SSI) |
 | **Redes Externas** | Twitter, Discord, Telegram, Instagram, TikTok |
-| **Geoespacial** | PostGIS, Tile38, Mapbox, Three.js, Turf.js |
+| **Geoespacial** | PostGIS, Tile38, Leaflet, Three.js, Turf.js |
 
 ---
 
@@ -445,10 +446,13 @@ src/
 | **Blockchain Connector** | 80% | 🔷 Producción | Polygon/MSR/Eth/BSC; pendiente RPC real |
 | **External Networks** | 80% | 🔷 Producción | Twitter/Discord/TG/IG/TikTok; pendiente API keys |
 | **Scoring Engine V2** | 100% | ✅ Producción | 6 reglas, breakdown, confidence |
-| **Frontend UI** | 85% | 🔷 Producción | React 18, 60+ componentes, 80+ páginas |
+| **Frontend UI** | 88% | 🔷 Producción | React 18, 90+ componentes, 80+ páginas, lazy-loading imágenes |
 | **Supabase Integration** | 85% | 🔷 Producción | Auth, RLS, 32+ tablas, edge functions |
 | **Migraciones SQL** | 100% | ✅ Producción | 10 migraciones, PostGIS, RLS policies |
-| **DevOps (CI/CD)** | 72% | 🟡 Mejora | CI sólido; CD pendiente, blue/green |
+| **DevOps (CI/CD)** | 80% | 🔷 Producción | CI sólido, build Vite 8 (Rolldown/Oxc), Sentry + PostHog externalizados |
+| **CodeQL Security** | 100% | ✅ 0 alerts | 12+ alerts corregidas: XSS, SQLi, randomness, DOM injection, Prometheus escaping |
+| **PWA** | 90% | ✅ Producción | Service Worker cache-first, manifest con maskable icons, offline fallback |
+| **SEO** | 90% | ✅ Producción | Sitemap XML, Open Graph, Schema.org, robots.txt, meta tags |
 | **Testing** | 75% | 🔷 Producción | 17 tests (7 integración, 2 E2E); Vitest + Playwright |
 | **Connect Nativo (ANUBIS+PHOENIX)** | 100% | ✅ Producción | TokenVault, ConnectorRegistry, TriggerRouter, eventos FederationBus |
 | **Health API** | 100% | ✅ Producción | GET /api/health, HealthService con timeout y status agregado |
@@ -508,7 +512,13 @@ GLOBAL:             ██████████████████░░
 - [x] Lint: 0 errores (ESLint flat config, 22 warnings)
 - [x] TypeScript: 0 errores (strict mode)
 - [x] Testing: 17 tests (7 integración, 2 E2E)
-- [x] Sitemap actualizado con 80+ rutas reales
+- [x] Sitemap XML con rutas principales
+- [x] CodeQL: 0 alerts de alta/media severidad (InputValidation, randomness, DOM injection, Prometheus)
+- [x] PWA: Service Worker cache-first + network-first API + offline fallback
+- [x] CSP: Content Security Policy robusta (Sentry, PostHog, Google Fonts, Cloudflare)
+- [x] Vite 8 + Rolldown/Oxc: build exitoso, chunks vendor optimizados, Sentry/PostHog externalizados
+- [x] Fuentes: Google Fonts con font-display: swap + preconnect + carga diferida
+- [x] Imágenes: lazy-loading en 40+ componentes
 - [x] Merge a origin/main consolidado
 
 ### 🟡 FASE 5 — EN PROGRESO
@@ -520,6 +530,9 @@ GLOBAL:             ██████████████████░░
 - [ ] Cobertura de tests >80%
 - [ ] Integración Micro-Sentinel con FederationBus datos reales
 - [ ] Datos de ejemplo para gemelos digitales (node, commerce, sensor)
+- [ ] Reducir deuda técnica: 54 archivos con @ts-nocheck → tipado completo
+- [ ] Reemplazar fotos mock de picsum.photos con assets reales del territorio
+- [ ] Certificación PQC formal (Kyber-1024 + AES-256-GCM)
 
 ### 🔵 FASE 6-7 — FUTURO
 - [ ] CD pipeline: staging/producción con blue-green deployment
