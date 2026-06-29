@@ -22,6 +22,7 @@ import { RDMAuthProvider, useRDMAuth } from '@/contexts/RDMAuthContext'
 import { PostHogProvider } from '@/integrations/observability/posthog'
 import { NotificationProvider } from '@/components/NotificationSystem'
 import { SpeedInsights } from '@vercel/speed-insights/react'
+import { Analytics } from '@vercel/analytics/react'
 
 // ===== Mother repo pages =====
 const Index = lazy(() => import('./pages/Index'))
@@ -415,6 +416,7 @@ const App = () => {
             <NotificationProvider>
               <AppInner />
               <SpeedInsights />
+              <Analytics />
             </NotificationProvider>
           </RDMAuthProvider>
         </PostHogProvider>
