@@ -1,5 +1,3 @@
-import { createHash } from "crypto";
-import { v4 as uuidv4 } from "uuid";
 import { logger } from "@/lib/logger";
 
 export type ChainType = "POLYGON" | "MSR" | "ETHEREUM" | "BSC";
@@ -56,10 +54,10 @@ export class BlockchainConnector {
   }
 
   async anchorToChain(data: string, chain: ChainType = "POLYGON"): Promise<BlockchainTransaction> {
-    const hash = createHash("sha256").update(data).digest("hex");
+    const hash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(data)))).map((b) => b.toString(16).padStart(2, "0")).join("");
 
     const tx: BlockchainTransaction = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       chain,
       type: "LEDGER_ANCHOR",
       payload: { dataHash: hash, originalLength: data.length },
@@ -91,10 +89,10 @@ export class BlockchainConnector {
   ): Promise<BlockchainTransaction> {
     const payload = { bookId, contentHash, metadata };
     const data = JSON.stringify(payload);
-    const hash = createHash("sha256").update(data).digest("hex");
+    const hash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(data)))).map((b) => b.toString(16).padStart(2, "0")).join("");
 
     const tx: BlockchainTransaction = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       chain,
       type: "BOOKPI_HASH",
       payload,

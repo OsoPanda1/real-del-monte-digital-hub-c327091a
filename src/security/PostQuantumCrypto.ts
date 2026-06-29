@@ -1,15 +1,6 @@
 import { logger } from "@/lib/logger";
 
-let _nodeCrypto: typeof import("crypto") | null = null;
-async function getNodeCrypto(): Promise<typeof import("crypto")> {
-  if (!_nodeCrypto) {
-    _nodeCrypto = await import("crypto");
-  }
-  return _nodeCrypto;
-}
-
-const AES_256_KEY_LEN = 32;
-const IV_LEN = 16;
+// Web Crypto API (browser-native) — sin dependencia de Node.js crypto
 
 interface PQCKeyPair {
   publicKey: string;
@@ -23,95 +14,92 @@ interface PQCCiphertext {
   kemCiphertext: string;
 }
 
+function hex(buf: ArrayBuffer): string {
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function fromHex(hex: string): Uint8Array {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+  return bytes;
+}
+
+async function sha256(data: string | Uint8Array): Promise<ArrayBuffer> {
+  const input = typeof data === "string" ? new TextEncoder().encode(data) : data;
+  return crypto.subtle.digest("SHA-256", input);
+}
+
+async function sha512(data: string | Uint8Array): Promise<ArrayBuffer> {
+  const input = typeof data === "string" ? new TextEncoder().encode(data) : data;
+  return crypto.subtle.digest("SHA-512", input);
+}
+
 export class PostQuantumCrypto {
   private kemSeed: string | undefined;
 
   constructor(seed?: string) {
-    if (seed) {
-      this.kemSeed = seed;
-    }
-  }
-
-  private async node(): Promise<typeof import("crypto")> {
-    return getNodeCrypto();
+    if (seed) this.kemSeed = seed;
   }
 
   async keygen(identity?: string): Promise<PQCKeyPair> {
-    const { createHash, randomBytes } = await this.node();
-    const seed = identity
-      ? createHash("sha256").update(identity + (this.kemSeed ?? "")).digest()
-      : randomBytes(32);
-
-    const publicKey = createHash("sha512").update(seed).digest("hex");
-    const secretKey = createHash("sha512").update(seed).digest("hex").split("").reverse().join("");
-
+    const seedInput = identity ? new TextEncoder().encode(identity + (this.kemSeed ?? "")) : crypto.getRandomValues(new Uint8Array(32));
+    const seedHash = identity ? await sha256(seedInput) : seedInput.buffer;
+    const publicKey = hex(await sha512(identity ? seedHash : seedInput));
+    const secretKey = publicKey.split("").reverse().join("");
     return { publicKey, secretKey };
   }
 
   async encapsulate(publicKey: string): Promise<{ sharedSecret: string; kemCiphertext: string }> {
-    const { createHash, randomBytes } = await this.node();
-    const ephemeral = randomBytes(32);
-    const sharedSecret = createHash("sha256").update(publicKey + ephemeral.toString("hex")).digest("hex");
-    const kemCiphertext = createHash("sha256").update(ephemeral).digest("hex");
+    const ephemeral = crypto.getRandomValues(new Uint8Array(32));
+    const sharedSecret = hex(await sha256(publicKey + hex(ephemeral)));
+    const kemCiphertext = hex(await sha256(ephemeral));
     return { sharedSecret, kemCiphertext };
   }
 
   async decapsulate(kemCiphertext: string, secretKey: string): Promise<string> {
-    const { createHash } = await this.node();
-    const sharedSecret = createHash("sha256").update(kemCiphertext + secretKey).digest("hex");
-    return sharedSecret;
+    return hex(await sha256(kemCiphertext + secretKey));
   }
 
   async encrypt(plaintext: string, sharedSecret: string): Promise<PQCCiphertext> {
-    const { createHash, randomBytes, createCipheriv } = await this.node();
-    const key = createHash("sha256").update(sharedSecret).digest().subarray(0, AES_256_KEY_LEN);
-    const iv = randomBytes(IV_LEN);
-
-    const cipher = createCipheriv("aes-256-gcm", key, iv);
-    let ciphertext = cipher.update(plaintext, "utf8", "hex");
-    ciphertext += cipher.final("hex");
-    const tag = cipher.getAuthTag().toString("hex");
-
-    const kemCiphertext = createHash("sha256").update(sharedSecret + iv.toString("hex")).digest("hex");
-
-    return { ciphertext, iv: iv.toString("hex"), tag, kemCiphertext };
+    const keyHash = await sha256(sharedSecret);
+    const key = await crypto.subtle.importKey("raw", keyHash.slice(0, 32), "AES-GCM", false, ["encrypt"]);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encoded = new TextEncoder().encode(plaintext);
+    const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoded);
+    const ciphertext = hex(encrypted.slice(0, encrypted.byteLength - 16));
+    const tag = hex(encrypted.slice(encrypted.byteLength - 16));
+    const kemCiphertext = hex(await sha256(sharedSecret + hex(iv)));
+    return { ciphertext, iv: hex(iv), tag, kemCiphertext };
   }
 
   async decrypt(encrypted: PQCCiphertext, sharedSecret: string): Promise<string> {
-    const { createHash, createDecipheriv } = await this.node();
-    const key = createHash("sha256").update(sharedSecret).digest().subarray(0, AES_256_KEY_LEN);
-    const { Buffer } = await import("buffer");
-    const iv = Buffer.from(encrypted.iv, "hex");
-    const tag = Buffer.from(encrypted.tag, "hex");
-
-    const decipher = createDecipheriv("aes-256-gcm", key, iv);
-    decipher.setAuthTag(tag);
-    let plaintext = decipher.update(encrypted.ciphertext, "hex", "utf8");
-    plaintext += decipher.final("utf8");
-    return plaintext;
+    const keyHash = await sha256(sharedSecret);
+    const key = await crypto.subtle.importKey("raw", keyHash.slice(0, 32), "AES-GCM", false, ["decrypt"]);
+    const iv = fromHex(encrypted.iv);
+    const ct = fromHex(encrypted.ciphertext);
+    const tag = fromHex(encrypted.tag);
+    const combined = new Uint8Array(ct.length + tag.length);
+    combined.set(ct, 0); combined.set(tag, ct.length);
+    const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, combined);
+    return new TextDecoder().decode(decrypted);
   }
 
   async sign(data: string, secretKey: string): Promise<string> {
-    const { createHmac } = await this.node();
-    return createHmac("sha512", secretKey).update(data).digest("hex");
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secretKey), { name: "HMAC", hash: "SHA-512" }, false, ["sign"]);
+    const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(data));
+    return hex(sig);
   }
 
   async verify(data: string, signature: string, publicKey: string): Promise<boolean> {
-    const { createHmac } = await this.node();
-    const expected = createHmac("sha512", publicKey).update(data).digest("hex");
-    return signature === expected;
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(publicKey), { name: "HMAC", hash: "SHA-512" }, false, ["verify"]);
+    return crypto.subtle.verify("HMAC", key, fromHex(signature), new TextEncoder().encode(data));
   }
 
   async hash(data: string): Promise<string> {
-    const { createHash } = await this.node();
-    return createHash("sha3-512").update(data).digest("hex");
+    return hex(await sha512(data));
   }
 }
 
-let _pqc: PostQuantumCrypto | null = null;
 export function getPQC(): PostQuantumCrypto {
-  if (!_pqc) {
-    _pqc = new PostQuantumCrypto();
-  }
-  return _pqc;
+  return new PostQuantumCrypto();
 }

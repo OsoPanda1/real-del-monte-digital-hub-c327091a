@@ -1,4 +1,5 @@
 {
+  "node": "24.x",
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",

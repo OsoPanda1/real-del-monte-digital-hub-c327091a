@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { logger } from "@/lib/logger";
 
 export type ExternalNetwork = "TWITTER" | "DISCORD" | "TELEGRAM" | "INSTAGRAM" | "TIKTOK";
@@ -18,6 +17,7 @@ interface NetworkMessage {
   mediaUrls: string[];
   timestamp: Date;
   status: "PENDING" | "SENT" | "FAILED";
+  retryCount: number;
   targetAudience?: string;
 }
 
@@ -76,7 +76,7 @@ export class ExternalNetworksConnector {
 
     const fullMessage: NetworkMessage = {
       ...message,
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       timestamp: new Date(),
       status: "PENDING",
     };
@@ -149,8 +149,10 @@ export class ExternalNetworksConnector {
       headers["Authorization"] = `Bearer ${creds.accessToken}`;
     }
 
-    const { createHmac } = await import("crypto");
-    const signature = createHmac("sha256", creds.apiSecret).update(JSON.stringify(payloads[network])).digest("hex");
+    const enc = new TextEncoder();
+    const hmacKey = await crypto.subtle.importKey("raw", enc.encode(creds.apiSecret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    const sig = await crypto.subtle.sign("HMAC", hmacKey, enc.encode(JSON.stringify(payloads[network])));
+    const signature = Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, "0")).join("");
     headers["X-TAMV-Signature"] = signature;
 
     const response = await fetch(endpoint, {

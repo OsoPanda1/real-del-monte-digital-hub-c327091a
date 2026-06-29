@@ -1,6 +1,5 @@
-// src/pages/ArchivoSonoro.tsx
-import React, { useEffect, useState } from "react";
-import { useMusic } from "../music/MusicContext";
+import { useState } from "react";
+import { useMusicPlayer } from "@/modules/music/hooks/useMusicPlayer";
 
 interface DonationOption {
   amount: number;
@@ -17,26 +16,8 @@ const DONATION_OPTIONS: DonationOption[] = [
 ];
 
 export const ArchivoSonoro: React.FC = () => {
-  const { tracks, setTracks, playTrack, currentTrack } = useMusic();
-  const [loading, setLoading] = useState(false);
+  const { tracks, currentTrack, isPlaying, play, togglePlay } = useMusicPlayer();
   const [customAmount, setCustomAmount] = useState<string>("");
-
-  useEffect(() => {
-    const fetchTracks = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch("/api/music");
-        const data = await res.json();
-        setTracks(data);
-      } catch (err) {
-        console.error("Error loading tracks", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTracks();
-  }, [setTracks]);
 
   const handleDonate = async (amount: number) => {
     try {
@@ -89,23 +70,13 @@ export const ArchivoSonoro: React.FC = () => {
 
       <section className="grid gap-6 md:grid-cols-[2fr_1fr]">
         <div>
-          {loading && (
-            <p className="text-sm text-zinc-500">Cargando pistas...</p>
-          )}
-
-          {!loading && tracks.length === 0 && (
-            <p className="text-sm text-zinc-500">
-              Pronto encontrarás aquí las primeras piezas del archivo sonoro.
-            </p>
-          )}
-
           <div className="grid gap-4 sm:grid-cols-2">
-            {tracks.map((track) => {
-              const isActive = currentTrack?.id === track.id;
+            {tracks.map((track, idx) => {
+              const isActive = currentTrack?.slug === track.slug;
               return (
                 <button
-                  key={track.id}
-                  onClick={() => playTrack(track)}
+                  key={track.slug}
+                  onClick={() => { if (isActive) { togglePlay(); } else { play(idx); } }}
                   className={`flex items-start gap-3 p-3 rounded-lg border text-left transition
                     ${
                       isActive
@@ -114,7 +85,7 @@ export const ArchivoSonoro: React.FC = () => {
                     }`}
                 >
                   <img
-                    src={track.coverUrl}
+                    src={track.cover_url ?? ""}
                     alt={track.title}
                     className="w-14 h-14 rounded-md object-cover border border-zinc-700"
                   />
@@ -125,14 +96,9 @@ export const ArchivoSonoro: React.FC = () => {
                     <span className="text-[11px] text-zinc-400">
                       {track.artist}
                     </span>
-                    {track.description && (
-                      <span className="mt-1 text-[11px] text-zinc-500 line-clamp-3">
-                        {track.description}
-                      </span>
-                    )}
                     {isActive && (
                       <span className="mt-1 text-[10px] text-emerald-300 font-mono uppercase tracking-[0.18em]">
-                        Reproduciendo…
+                        {isPlaying ? "Reproduciendo…" : "Pausado"}
                       </span>
                     )}
                   </div>
@@ -140,6 +106,11 @@ export const ArchivoSonoro: React.FC = () => {
               );
             })}
           </div>
+          {tracks.length === 0 && (
+            <p className="text-sm text-zinc-500 mt-4">
+              Pronto encontrarás aquí las primeras piezas del archivo sonoro.
+            </p>
+          )}
         </div>
 
         <aside className="space-y-4">

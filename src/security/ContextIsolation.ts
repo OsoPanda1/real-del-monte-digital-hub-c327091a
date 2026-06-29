@@ -1,4 +1,3 @@
-import { createHash, randomBytes } from "crypto";
 import { logger } from "@/lib/logger";
 
 interface IsolatedSession {
@@ -20,9 +19,14 @@ export class ContextIsolation {
     this.sessionTimeoutMs = sessionTimeoutMinutes * 60 * 1000;
   }
 
-  createSession(userId: string): IsolatedSession {
-    const sessionId = createHash("sha256").update(`${userId}:${randomBytes(32).toString("hex")}:${Date.now()}`).digest("hex").slice(0, 32);
-    const contextToken = createHash("sha256").update(`${sessionId}:${userId}`).digest("hex");
+  async createSession(userId: string): Promise<IsolatedSession> {
+    const enc = new TextEncoder();
+    const seed = crypto.getRandomValues(new Uint8Array(32));
+    const seedHex = Array.from(seed).map((b) => b.toString(16).padStart(2, "0")).join("");
+    const sessionIdBuf = await crypto.subtle.digest("SHA-256", enc.encode(`${userId}:${seedHex}:${Date.now()}`));
+    const sessionId = Array.from(new Uint8Array(sessionIdBuf)).map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 32);
+    const tokenBuf = await crypto.subtle.digest("SHA-256", enc.encode(`${sessionId}:${userId}`));
+    const contextToken = Array.from(new Uint8Array(tokenBuf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 
     const session: IsolatedSession = {
       sessionId,
