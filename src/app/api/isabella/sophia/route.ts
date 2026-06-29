@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       return Response.json({ success: false, error: 'Falta campo requerido: research_request/researchRequest' }, { status: 400 });
     }
     const ctx = {
-      sessionId: `research-${Date.now()}`,
+      sessionId: `research-${crypto.randomUUID().slice(0, 12)}`,
       territoryId: 'RDM',
       userId: (val(body, ['user_id', 'userId']) as string) ?? 'anonymous',
       timestamp: new Date(),

@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       return Response.json({ success: false, error: 'Faltan campos requeridos: scenario_definition/scenarioDefinition, time_horizon/timeHorizon, dimensions' }, { status: 400 });
     }
     const ctx = {
-      sessionId: `sim-${Date.now()}`,
+      sessionId: `sim-${crypto.randomUUID().slice(0, 12)}`,
       territoryId: 'RDM',
       userId: (val(body, ['user_id', 'userId']) as string) ?? 'anonymous',
       timestamp: new Date(),

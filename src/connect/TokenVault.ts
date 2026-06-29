@@ -1,13 +1,11 @@
 import type { TokenRecord, ConnectSubject, ConnectTokenResponse, ConnectorConfig } from './types';
 import { federationBus } from '@/federaciones/FederationBus';
 
-function hashToken(token: string): string {
-  let h = 0;
-  for (let i = 0; i < token.length; i++) {
-    h = ((h << 5) - h) + token.charCodeAt(i);
-    h = h & h;
-  }
-  return Math.abs(h).toString(16).padStart(16, '0');
+async function hashToken(token: string): Promise<string> {
+  const enc = new TextEncoder();
+  const data = enc.encode(token);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 class TokenVault {
@@ -19,15 +17,15 @@ class TokenVault {
     scopes: string[] = [],
     installationId?: string,
   ): Promise<ConnectTokenResponse> {
-    const raw = `${connector.uid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
-    const id = `tok-${hashToken(raw).slice(0, 12)}`;
+    const raw = `${connector.uid}:${Date.now()}:${crypto.randomUUID().replace(/-/g, '')}`;
+    const id = `tok-${(await hashToken(raw)).slice(0, 12)}`;
     const expiresAt = Date.now() + 3600_000;
 
     const record: TokenRecord = {
       id,
       connectorUid: connector.uid,
       subject,
-      tokenHash: hashToken(raw),
+      tokenHash: await hashToken(raw),
       expiresAt,
       scopes,
       installationId,
@@ -51,7 +49,7 @@ class TokenVault {
   }
 
   async verify(token: string): Promise<TokenRecord | null> {
-    const h = hashToken(token);
+    const h = await hashToken(token);
     for (const record of this.records.values()) {
       if (record.tokenHash === h && record.expiresAt > Date.now()) {
         return record;

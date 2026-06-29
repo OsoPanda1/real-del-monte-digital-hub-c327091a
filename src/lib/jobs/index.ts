@@ -23,7 +23,7 @@ export function registerJob(type: string, handler: JobHandler): void {
 }
 
 export function enqueue(type: string, payload: unknown, priority = 0, maxAttempts = 3): string {
-  const id = `job-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const id = `job-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
   const job: Job = { id, type, payload, priority, attempts: 0, maxAttempts, createdAt: new Date() };
   queue.push(job);
   queue.sort((a, b) => b.priority - a.priority);

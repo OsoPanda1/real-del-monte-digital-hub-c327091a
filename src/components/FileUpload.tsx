@@ -130,7 +130,7 @@ const FileUpload = ({
       if (uploadFile.status !== "idle" && uploadFile.status !== "uploading") continue;
 
       const ext = uploadFile.file.name.split(".").pop();
-      const fileName = `${baseFolder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const fileName = `${baseFolder}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
 
       const { error } = await supabase.storage
         .from(bucket)

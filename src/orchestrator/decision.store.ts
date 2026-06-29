@@ -17,7 +17,7 @@ export class DecisionStore {
 
   save(type: string, input: unknown, output: unknown, sovereignty: string, duration: number): DecisionRecord {
     const record: DecisionRecord = {
-      id: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      id: crypto.randomUUID(),
       type,
       input,
       output,
