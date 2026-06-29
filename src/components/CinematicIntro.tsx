@@ -1,15 +1,14 @@
 import {
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Volume2, VolumeX, SkipForward } from "lucide-react";
-// Si no tienes estos assets, comenta o reemplaza:
-import introMountains from "@/assets/rdm-intro-mountains.jpg";
-import audiointro from "@/assets/audiointro.mp3";
+
+// Assets opcionales — se cargan dinámicamente para no fallar si no existen
+const audiointro: string | undefined = undefined;
 
 interface CinematicIntroProps {
   onComplete: () => void;
@@ -1008,17 +1007,21 @@ export default function CinematicIntro({
 
   // Preload audio + simple timeline de storyMoments tipo segunda intro
   useEffect(() => {
-    const audio = new Audio(audiointro);
-    audio.preload = "auto";
-    audio.volume = 0.45;
-    audioRef.current = audio;
+    if (audiointro) {
+      const audio = new Audio(audiointro);
+      audio.preload = "auto";
+      audio.volume = 0.45;
+      audioRef.current = audio;
+    }
 
     if (!started) return;
 
-    audio
-      .play()
-      .then(() => setAudioEnabled(true))
-      .catch(() => {});
+    if (audioRef.current) {
+      audioRef.current
+        .play()
+        .then(() => setAudioEnabled(true))
+        .catch(() => {});
+    }
 
     const momentTimers = STORY_MOMENTS.map((_, index) =>
       window.setTimeout(
@@ -1116,13 +1119,11 @@ export default function CinematicIntro({
               opacity: started ? 0.4 : 0.2,
             }}
             transition={{ duration: 4, ease: "easeOut" }}
+            style={{
+              background:
+                "linear-gradient(135deg, #0a1628 0%, #1a2844 30%, #2d1f3d 60%, #0d0f1a 100%)",
+            }}
           >
-            <img
-              src={introMountains}
-              alt="Real del Monte"
-              className="h-full w-full object-cover"
-              style={{ filter: "saturate(0.8)" }}
-            />
             <div className="absolute inset-0 bg-gradient-to-b from-[#05080f] via-[#05080f]/40 to-[#05080f]" />
           </motion.div>
 
