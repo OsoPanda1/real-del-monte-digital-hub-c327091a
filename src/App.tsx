@@ -97,6 +97,7 @@ const ImpactoCivilizatorio = lazy(() => import('./pages/ImpactoCivilizatorio'))
 // ===== Genesis / TAMV pages =====
 const Documentation = lazy(() => import('./pages/Documentation'))
 const Membership = lazy(() => import('./pages/Membership'))
+const AuthCallback = lazy(() => import('./pages/AuthCallback'))
 const MetaverseHome = lazy(() => import('./pages/MetaverseHome'))
 const Register = lazy(() => import('./pages/Register'))
 const Login = lazy(() => import('./pages/Login'))
@@ -234,6 +235,7 @@ const AnimatedRoutes = () => {
           <Route path="/arte" element={<RouteErrorBoundary route="/arte"><Arte /></RouteErrorBoundary>} />
           <Route path="/rutas" element={<RouteErrorBoundary route="/rutas"><Rutas /></RouteErrorBoundary>} />
           <Route path="/auth" element={<RouteErrorBoundary route="/auth"><Auth /></RouteErrorBoundary>} />
+          <Route path="/auth/callback" element={<RouteErrorBoundary route="/auth/callback"><AuthCallback /></RouteErrorBoundary>} />
           <Route path="/apoya" element={<RouteErrorBoundary route="/apoya"><Apoya /></RouteErrorBoundary>} />
           <Route path="/reglamento" element={<RouteErrorBoundary route="/reglamento"><Reglamento /></RouteErrorBoundary>} />
           <Route path="/admin" element={<RouteErrorBoundary route="/admin"><AdminDashboard /></RouteErrorBoundary>} />

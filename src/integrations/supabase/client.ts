@@ -42,11 +42,10 @@ declare global {
 
 function createSupabaseClient(): SupabaseClient<Database> {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    // Devuelve un cliente placeholder para no romper tree-shaking ni SSR.
-    // Las llamadas reales fallarán con mensajes claros de Supabase.
-    return createClient<Database>('https://placeholder.supabase.co', 'placeholder-key', {
-      auth: { persistSession: false },
-    })
+    throw new Error(
+      '[supabase] Configuración incompleta: define VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY ' +
+      'en .env.local o .env. Copia .env.example como .env y completa los valores.',
+    )
   }
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
