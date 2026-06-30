@@ -65,10 +65,26 @@ export default function Auth() {
     const { error } = await signUpEmail(parsed.data.email, parsed.data.password, parsed.data.displayName);
     setLoading(false);
     if (error) {
-      toast({ title: "Error al registrarse", description: error, variant: "destructive" });
+      // Detectar si es error de confirmación de email
+      const isEmailConfirmationError = error.includes('email') || 
+        error.includes('confirm') || 
+        error.includes('verify') ||
+        error.includes('already registered') ||
+        error.includes('already exists');
+      
+      if (isEmailConfirmationError) {
+        toast({ 
+          title: "Cuenta creada", 
+          description: "Revisa tu correo para confirmar la cuenta. Si no llega, verifica spam.", 
+          variant: "default" 
+        });
+      } else {
+        toast({ title: "Error al registrarse", description: error, variant: "destructive" });
+      }
       return;
     }
-    toast({ title: "¡Cuenta creada!", description: "Revisa tu correo para confirmar." });
+    toast({ title: "¡Cuenta creada!", description: "Bienvenido a RDM Digital." });
+    navigate("/perfil");
   };
 
   const handleGoogle = async () => {

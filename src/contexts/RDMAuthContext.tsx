@@ -83,8 +83,7 @@ export function RDMAuthProvider({ children }: { children: ReactNode }) {
         setProfile(profileData ?? null)
         setRoles(((rolesData ?? []) as { role: AppRole }[]).map((x) => x.role))
       } catch (e) {
-        const message =
-          e instanceof Error ? e.message : 'Error desconocido al cargar perfil/roles'
+        const message = e instanceof Error ? e.message : 'Error desconocido al cargar perfil/roles'
         setError(`[auth] Excepción en loadProfileAndRoles: ${message}`)
         setProfile(null)
         setRoles([])
@@ -145,8 +144,7 @@ export function RDMAuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (e) {
         if (!isMounted) return
-        const message =
-          e instanceof Error ? e.message : 'Error desconocido al inicializar sesión'
+        const message = e instanceof Error ? e.message : 'Error desconocido al inicializar sesión'
         setError(`[auth] Excepción en init de sesión: ${message}`)
         setSession(null)
         setUser(null)
@@ -191,8 +189,7 @@ export function RDMAuthProvider({ children }: { children: ReactNode }) {
       }
       return { error: null }
     } catch (e) {
-      const message =
-        e instanceof Error ? e.message : 'Error desconocido al iniciar sesión'
+      const message = e instanceof Error ? e.message : 'Error desconocido al iniciar sesión'
       const msg = `[auth] Excepción en signInEmail: ${message}`
       setError(msg)
       setUser(null)
@@ -211,15 +208,20 @@ export function RDMAuthProvider({ children }: { children: ReactNode }) {
     setLoading(true)
     setError(null)
     try {
-      const redirectUrl =
-        import.meta.env.VITE_NEXT_PUBLIC_SUPABASE_REDIRECT_URL ??
-        (typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined)
+      const isDev = import.meta.env.DEV
 
-      const { error } = await supabase.auth.signUp({
+      // En desarrollo: si no hay redirect URL configurada, no esperar confirmación de email
+      // para desarrollo más fluido (email confirmations disabled en Supabase dashboard)
+      const redirectUrl = isDev
+        ? undefined
+        : (import.meta.env.VITE_NEXT_PUBLIC_SUPABASE_REDIRECT_URL ??
+          (typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined))
+
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: redirectUrl,
+          ...(redirectUrl && { emailRedirectTo: redirectUrl }),
           data: { display_name: displayName },
         },
       })
@@ -230,10 +232,19 @@ export function RDMAuthProvider({ children }: { children: ReactNode }) {
         return { error: msg }
       }
 
+      // En dev: si no hay redirect URL y el usuario se creó, intentar auto sign-in
+      // (funciona si email confirmations están deshabilitadas en Supabase dashboard)
+      if (isDev && data.user && !data.session && !redirectUrl) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+        if (!signInError) {
+          return { error: null }
+        }
+        // Si falla el auto sign-in, es porque requiere confirmación de email
+      }
+
       return { error: null }
     } catch (e) {
-      const message =
-        e instanceof Error ? e.message : 'Error desconocido al registrarse'
+      const message = e instanceof Error ? e.message : 'Error desconocido al registrarse'
       const msg = `[auth] Excepción en signUpEmail: ${message}`
       setError(msg)
       return { error: msg }
@@ -263,8 +274,7 @@ export function RDMAuthProvider({ children }: { children: ReactNode }) {
 
       return { error: null }
     } catch (e) {
-      const message =
-        e instanceof Error ? e.message : 'Error desconocido en signInGoogle'
+      const message = e instanceof Error ? e.message : 'Error desconocido en signInGoogle'
       const msg = `[auth] Excepción en signInGoogle: ${message}`
       setError(msg)
       return { error: msg }
@@ -285,8 +295,7 @@ export function RDMAuthProvider({ children }: { children: ReactNode }) {
       setProfile(null)
       setRoles([])
     } catch (e) {
-      const message =
-        e instanceof Error ? e.message : 'Error desconocido al cerrar sesión'
+      const message = e instanceof Error ? e.message : 'Error desconocido al cerrar sesión'
       setError(`[auth] Excepción en signOut: ${message}`)
     } finally {
       setLoading(false)

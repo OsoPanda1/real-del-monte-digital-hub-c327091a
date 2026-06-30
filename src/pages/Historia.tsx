@@ -398,7 +398,7 @@ const HistoriaPage = () => {
         </div>
 
         {/* Introduction Stats */}
-        <section className="py-16 bg-muted/30">
+        <section className="py-16 bg-muted/20">
           <div className="container mx-auto px-4 md:px-8">
             <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {[
@@ -409,10 +409,10 @@ const HistoriaPage = () => {
               ].map((stat, index) => (
                 <StaggerItem key={index}>
                   <div className="text-center">
-                    <div className="text-4xl md:text-5xl font-serif font-bold text-terracotta mb-2">
+                    <div className="text-4xl md:text-5xl font-serif font-bold text-[hsl(var(--petrified-teal))] mb-2 drop-shadow-[0_0_15px_hsl(var(--petrified-teal)/0.3)]">
                       {stat.value}
                     </div>
-                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                    <div className="text-sm text-[hsl(var(--deep-black))]/70 font-medium">{stat.label}</div>
                   </div>
                 </StaggerItem>
               ))}
@@ -443,50 +443,103 @@ const HistoriaPage = () => {
               {/* Vertical line */}
               <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-terracotta via-gold to-forest md:-translate-x-1/2" />
               
-              {timeline.map((item, index) => (
-                <motion.div
-                  key={item.year}
-                  initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ delay: index * 0.1, duration: 0.6 }}
-                  className={`relative flex items-start gap-8 mb-16 last:mb-0 ${
-                    index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                  }`}
-                >
-                  {/* Content */}
-                  <div className={`flex-1 ${index % 2 === 0 ? "md:text-right" : "md:text-left"}`}>
-                    <div className={`glass rounded-2xl p-6 ${index % 2 === 0 ? "md:ml-auto" : "md:mr-auto"} max-w-lg hover:shadow-elevated transition-shadow duration-300`}>
-                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-foreground/5 text-foreground text-sm font-bold mb-3">
-                        {item.year}
-                      </span>
-                      <h3 className="font-serif text-xl font-bold text-foreground mb-2">
-                        {item.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                        {item.description}
-                      </p>
-                      <p className="text-xs text-muted-foreground/70 leading-relaxed border-t border-border pt-3">
-                        {item.details}
-                      </p>
+                {timeline.map((item, index) => (
+                  <motion.div
+                    key={item.year}
+                    initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ delay: index * 0.1, duration: 0.6 }}
+                    className={`relative flex items-start gap-8 mb-16 last:mb-0 ${
+                      index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                    }`}
+                  >
+                    {/* Content */}
+                    <div className={`flex-1 ${index % 2 === 0 ? "md:text-right" : "md:text-left"}`}>
+                      <div 
+                        className={`crystal-card rounded-2xl p-6 ${index % 2 === 0 ? "md:ml-auto" : "md:mr-auto"} max-w-lg hover:shadow-elevated transition-shadow duration-300 ${index % 2 === 0 ? "hover:scale-[1.02]" : "hover:scale-[1.02]"}`}
+                        style={{
+                          background: 'linear-gradient(135deg, hsl(var(--crystal-clear)/0.9), hsl(var(--crystal-glow)/0.8))',
+                          border: '1px solid hsl(var(--crystal-border)/0.6)',
+                          boxShadow: '0 10px 40px hsl(var(--crystal-glow)/0.3), inset 0 0 30px hsl(var(--crystal-clear)/0.4)',
+                          backdropFilter: 'blur(10px)',
+                        }}
+                      >
+                        <span 
+                          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[hsl(var(--crystal-clear)/0.8)] text-[hsl(var(--deep-black))] text-sm font-bold mb-3 border border-[hsl(var(--crystal-border)/0.4)] shadow-[0_0_15px_hsl(var(--crystal-glow)/0.3)]"
+                          style={{
+                            transition: 'all 0.3s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'hsl(var(--crystal-glow))';
+                            e.currentTarget.style.color = 'white';
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = '0 0 25px hsl(var(--crystal-glow)/0.6)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'hsl(var(--crystal-clear)/0.8)';
+                            e.currentTarget.style.color = 'hsl(var(--deep-black))';
+                            e.currentTarget.style.transform = 'none';
+                            e.currentTarget.style.boxShadow = '0 0 15px hsl(var(--crystal-glow)/0.3)';
+                          }}
+                        >
+                          {item.year}
+                        </span>
+                        <h3 
+                          className="font-serif text-xl font-bold text-[hsl(var(--deep-black))] mb-2 hover:text-[hsl(var(--petrified-teal))] transition-colors"
+                          style={{
+                            textShadow: '0 2px 10px hsl(var(--deep-black)/0.1)',
+                          }}
+                        >
+                          {item.title}
+                        </h3>
+                        <p 
+                          className="text-sm text-[hsl(var(--deep-black))/0.8] leading-relaxed mb-3 font-medium"
+                          style={{
+                            lineHeight: '1.7',
+                          }}
+                        >
+                          {item.description}
+                        </p>
+                        <p 
+                          className="text-xs text-[hsl(var(--deep-black))/0.7] leading-relaxed border-t border-[hsl(var(--crystal-border)/0.4)] pt-3"
+                        >
+                          {item.details}
+                        </p>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Icon */}
-                  <div className="relative z-10 w-10 h-10 rounded-full bg-background border-4 border-background shadow-lg flex items-center justify-center shrink-0">
-                    <div className={`w-4 h-4 rounded-full ${item.color}`} />
-                  </div>
+                    {/* Icon */}
+                    <div 
+                      className="relative z-10 w-10 h-10 rounded-full bg-[hsl(var(--crystal-clear))] border-4 border-[hsl(var(--crystal-glow))] shadow-lg flex items-center justify-center shrink-0 hover:rotate-12 transition-transform duration-300"
+                      style={{
+                        boxShadow: '0 0 30px hsl(var(--crystal-glow)/0.5), inset 0 0 15px hsl(var(--crystal-glow)/0.3)',
+                      }}
+                    >
+                      <div 
+                        className={`w-4 h-4 rounded-full ${item.color} hover:scale-110 transition-transform duration-300`}
+                        style={{
+                          boxShadow: '0 0 20px currentColor',
+                          filter: 'brightness(1.2)',
+                        }}
+                      />
+                    </div>
 
-                  {/* Spacer for alternating layout */}
-                  <div className="flex-1 hidden md:block" />
-                </motion.div>
-              ))}
+                    {/* Spacer for alternating layout */}
+                    <div className="flex-1 hidden md:block" />
+                  </motion.div>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Heritage Tabs Section */}
-        <section className="py-24 bg-muted/30">
+          {/* Heritage Tabs Section */}
+          <section 
+            className="py-24 bg-gradient-to-b from-[hsl(var(--crystal-clear)/0.3)] to-[hsl(var(--crystal-clear)/0.1)]"
+            style={{
+              backgroundImage: 'radial-gradient(circle at center top, hsl(var(--crystal-glow)/0.1), transparent 70%)',
+            }}
+          >
           <div className="container mx-auto px-4 md:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
