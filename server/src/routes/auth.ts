@@ -5,6 +5,7 @@ import { signAuthToken } from "../middleware/auth.js";
 import { db } from "../lib/store.js";
 import { ensureProfile } from "../services/user.service.js";
 import { ensureMembership, ensureTokenBalance } from "../services/economy.service.js";
+import { limiters } from "../middleware/rateLimit.js";
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -16,7 +17,7 @@ const loginSchema = registerSchema;
 
 const authRouter = Router();
 
-authRouter.post("/register", async (req, res) => {
+authRouter.post("/register", limiters.auth, async (req, res) => {
   const parsed = registerSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
@@ -42,7 +43,7 @@ authRouter.post("/register", async (req, res) => {
   return res.status(201).json({ token, user: { id, email, role: normalizedRole } });
 });
 
-authRouter.post("/login", async (req, res) => {
+authRouter.post("/login", limiters.auth, async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });

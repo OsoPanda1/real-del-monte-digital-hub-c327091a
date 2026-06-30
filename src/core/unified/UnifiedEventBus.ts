@@ -134,7 +134,6 @@ export class UnifiedEventBus {
       TERRITORIAL_PHOTO: 'territorial:contribution',
       TERRITORIAL_RATING: 'territorial:contribution',
       TERRITORIAL_TIP: 'territorial:contribution',
-      TERRITORIAL_EVENT: 'territorial:contribution',
       TERRITORIAL_ROUTE: 'territorial:contribution',
       TERRITORIAL_POI_SUGGESTION: 'territorial:contribution',
       HEATMAP_UPDATE: 'territorial:heat_update',

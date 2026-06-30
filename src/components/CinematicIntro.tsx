@@ -1091,8 +1091,7 @@ export default function CinematicIntro({
 
   return (
     <AnimatePresence>
-      {overlayVisible && (
-        <motion.div
+      <motion.div
           exit={{
             opacity: 0,
             filter: "blur(20px) brightness(2)",
@@ -1415,7 +1414,6 @@ export default function CinematicIntro({
             </>
           )}
         </motion.div>
-      )}
     </AnimatePresence>
   );
 }

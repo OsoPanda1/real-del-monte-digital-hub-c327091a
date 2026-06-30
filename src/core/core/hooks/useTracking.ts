@@ -22,7 +22,7 @@ function getSessionId(): string | null {
     if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
       id = crypto.randomUUID();
     } else {
-      id = `rdm_${Math.random().toString(36).slice(2)}_${Date.now()}`;
+      id = `rdm_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
     }
     try {
       sessionStorage.setItem(SESSION_KEY, id);

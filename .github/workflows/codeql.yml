@@ -37,10 +37,7 @@ jobs:
       - name: Set CodeQL languages matrix (auto-detect)
         id: set-matrix
         uses: advanced-security/set-codeql-languages@v1
-        # Esta acción usa la API de lenguajes del repo y genera la matriz
-        # de lenguajes soportados para CodeQL. [web:7]
         with:
-          # Opcional: puedes excluir lenguajes si en algún momento no quieres analizarlos
           excluded-languages: ""
 
   # 2) Job principal de análisis CodeQL usando la matriz dinámica
@@ -62,10 +59,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # En monorepos y proyectos grandes esto ayuda a que CodeQL vea todo el código
           fetch-depth: 0
 
-      # Setup de runtimes comunes para el stack JS/TS del hub
       - name: Setup Node.js
         if: matrix.language == 'javascript-typescript'
         uses: actions/setup-node@v4
@@ -73,64 +68,15 @@ jobs:
           node-version-file: "package.json"
           cache: "npm"
 
-      # Si en algún momento agregas Python/Go/etc., puedes añadir más setups aquí
-      # - name: Setup Python
-      #   if: matrix.language == 'python'
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: "3.11"
-
-      # Inicializar CodeQL con configuración avanzada
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
-          # Para lenguajes no compilados (JS/TS, Actions) suele ser suficiente "none".
-          # Si agregas lenguajes compilados (c-cpp, java-kotlin, etc.), ajusta a "auto" o "manual". [web:9]
           build-mode: ${{ matrix.build-mode || 'none' }}
-          # Queries extendidas de seguridad + calidad
           queries: "+security-extended,security-and-quality"
-
-          # Puedes apuntar a un archivo de configuración custom si quieres
-          # un nivel aún más fino de control:
-          # config-file: .github/codeql/config.yml
-
-      # Build manual solo para lenguajes que lo requieran
-      - name: Run manual build steps (compiled languages)
-      if: matrix.build-mode == 'manual'
-      shell: bash
-      run: |
-        echo 'Using "manual" build mode for one or more languages.'
-        echo 'Replace this section with your real build commands, for example:'
-        echo '  npm ci'
-        echo '  npm run build'
-        echo '  make bootstrap'
-        echo '  make release'
-        exit 1
-
-      # Hook opcional: prueba rápida antes del análisis para evitar analizar código roto
-      - name: Run minimal tests (JS/TS)
-        if: matrix.language == 'javascript-typescript'
-        shell: bash
-        run: |
-          if [ -f package.json ]; then
-            npm ci
-            # Usa un script de test ligero (ej: "test:ci:security") para no duplicar el CI completo
-            if npm run test:ci:security; then
-              echo "Security/smoke tests passed. Proceeding with CodeQL analysis."
-            else
-              echo "Security/CI tests failed. Failing CodeQL workflow to avoid analyzing broken state."
-              exit 1
-            fi
-          else
-            echo "No package.json found; skipping JS/TS pre-tests."
-          fi
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
         with:
           category: "${{ env.CODEQL_CATEGORY_PREFIX }}/language:${{ matrix.language }}"
-          # Para repos con muchos escaneos y ramas, este ID ayuda a agrupar resultados
           upload: true
-          # Genera SARIF con categoría específica por lenguaje (útil si escalas a muchos lenguajes).
-          # sarif_category: "${{ matrix.language }}"
