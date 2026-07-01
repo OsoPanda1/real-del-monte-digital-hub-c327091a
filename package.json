@@ -1,7 +1,7 @@
 {
   "name": "rdm-digital-ltos",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,7 +16,10 @@
     "e2e:ui": "playwright test --ui",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
     "test:unit": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "isabella:init": "node scripts/isabella-init.mjs",
+    "isabella:telemetry": "node scripts/isabella-telemetry.mjs",
+    "check:predeploy": "npm run lint && npm run typecheck && npm run test:unit"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -66,6 +69,7 @@
     "framer-motion": "^12.38.0",
     "input-otp": "^1.4.2",
     "leaflet": "^1.9.4",
+    "lightningcss": "^1.28.0",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.4.6",
     "posthog-js": "^1.395.0",
@@ -106,13 +110,16 @@
     "jsdom": "^20.0.3",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.62.1",
+    "typescript": "^5.8.x",
+    "typescript-eslint": "^8.38.0",
     "vite": "^7.1.0",
     "vitest": "^4.1.9"
   },
   "engines": {
     "node": ">=22"
+  },
+  "overrides": {
+    "vite": "^7.1.0"
   },
   "license": "MIT"
 }
