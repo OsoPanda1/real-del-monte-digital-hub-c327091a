@@ -1,1 +1,248 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';\n\ninterface Render4DRequest {\n  operation: 'create-hypercube' | 'rotate-4d' | 'project-to-3d' | 'color-map';\n  payload: Record<string, unknown>;\n  context?: { userId?: string; sessionId?: string };\n}\n\nfunction hammingDistance(a: number, b: number): number {\n  let distance = 0;\n  let xor = a ^ b;\n  while (xor) {\n    distance += xor & 1;\n    xor >>= 1;\n  }\n  return distance;\n}\n\nfunction generateRotationMatrix(angle: number, plane: string = 'xy'): number[][] {\n  const cos = Math.cos(angle);\n  const sin = Math.sin(angle);\n\n  const matrix: number[][] = [\n    [1, 0, 0, 0],\n    [0, 1, 0, 0],\n    [0, 0, 1, 0],\n    [0, 0, 0, 1],\n  ];\n\n  if (plane === 'xy' || plane === 'yx') {\n    matrix[0][0] = cos;\n    matrix[0][1] = -sin;\n    matrix[1][0] = sin;\n    matrix[1][1] = cos;\n  } else if (plane === 'zw' || plane === 'wz') {\n    matrix[2][2] = cos;\n    matrix[2][3] = -sin;\n    matrix[3][2] = sin;\n    matrix[3][3] = cos;\n  }\n\n  return matrix;\n}\n\nfunction frequencyToRGB(frequency: number): { r: number; g: number; b: number } {\n  const wavelength = 380 + (frequency % 321);\n  let r = 0,\n    g = 0,\n    b = 0;\n\n  if (wavelength >= 380 && wavelength < 440) {\n    r = Math.abs(wavelength - 440) / (440 - 380);\n    b = 1;\n  } else if (wavelength >= 440 && wavelength < 490) {\n    g = (wavelength - 440) / (490 - 440);\n    b = 1;\n  } else if (wavelength >= 490 && wavelength < 510) {\n    g = 1;\n    b = Math.abs(wavelength - 510) / (510 - 490);\n  } else if (wavelength >= 510 && wavelength < 580) {\n    r = (wavelength - 510) / (580 - 510);\n    g = 1;\n  } else if (wavelength >= 580 && wavelength < 645) {\n    r = 1;\n    g = Math.abs(wavelength - 645) / (645 - 580);\n  } else if (wavelength >= 645 && wavelength <= 700) {\n    r = 1;\n  }\n\n  return {\n    r: Math.floor(r * 255),\n    g: Math.floor(g * 255),\n    b: Math.floor(b * 255),\n  };\n}\n\nfunction createHypercube() {\n  const vertices = [];\n  for (let i = 0; i < 16; i++) {\n    vertices.push({\n      id: i,\n      x: (i & 1) ? 1 : -1,\n      y: (i & 2) ? 1 : -1,\n      z: (i & 4) ? 1 : -1,\n      w: (i & 8) ? 1 : -1,\n    });\n  }\n\n  const edges = [];\n  for (let i = 0; i < 16; i++) {\n    for (let j = i + 1; j < 16; j++) {\n      if (hammingDistance(i, j) === 1) {\n        edges.push({ from: i, to: j });\n      }\n    }\n  }\n\n  return {\n    type: 'hypercube-4d',\n    vertexCount: vertices.length,\n    edgeCount: edges.length,\n    vertices,\n    edges,\n    topology: {\n      cells_0d: 16, // vertices\n      cells_1d: 32, // edges\n      cells_2d: 24, // square faces\n      cells_3d: 8, // cubic cells\n      cells_4d: 1, // the hypercube itself\n    },\n  };\n}\n\nfunction rotate4D(payload: Record<string, unknown>) {\n  const angle = (payload.angle as number) || 0.1;\n  const plane = (payload.plane as string) || 'xy';\n\n  const rotationMatrix = generateRotationMatrix(angle, plane);\n\n  return {\n    status: 'rotated',\n    angle,\n    plane,\n    rotationMatrix,\n    rotationApplied: true,\n  };\n}\n\nfunction projectTo3D(payload: Record<string, unknown>) {\n  const method = (payload.method as string) || 'schlegel';\n  const distance = (payload.distance as number) || 2;\n\n  const projection = [\n    { x: 1, y: 1, z: 1 },\n    { x: -1, y: 1, z: 1 },\n    { x: 1, y: -1, z: 1 },\n    { x: -1, y: -1, z: 1 },\n    { x: 0.5, y: 0.5, z: 0.5 },\n    { x: -0.5, y: 0.5, z: 0.5 },\n    { x: 0.5, y: -0.5, z: 0.5 },\n    { x: -0.5, y: -0.5, z: 0.5 },\n  ];\n\n  return {\n    status: 'projected',\n    method,\n    projectionType: '3D',\n    distance,\n    vertices: projection,\n    vertexCount: projection.length,\n    metadata: {\n      preservesTopology: method === 'schlegel',\n      visibilityOptimized: true,\n      renderReady: true,\n    },\n  };\n}\n\nfunction colorMap(payload: Record<string, unknown>) {\n  const frequency = (payload.frequency as number) || 440;\n  const colorScheme = (payload.colorScheme as string) || 'spectrum';\n\n  const baseColor = frequencyToRGB(frequency);\n\n  return {\n    status: 'colored',\n    colorScheme,\n    baseColor: `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`,\n    gradient: [\n      frequencyToRGB(frequency - 50),\n      baseColor,\n      frequencyToRGB(frequency + 50),\n    ].map((c) => `rgb(${c.r}, ${c.g}, ${c.b})`),\n    frequency,\n  };\n}\n\nexport default async function handler(req: VercelRequest, res: VercelResponse) {\n  const startTime = performance.now();\n\n  res.setHeader('Content-Type', 'application/json');\n  res.setHeader('X-Cell-Type', 'Render4D');\n  res.setHeader('X-Cell-Version', '1.0.0');\n\n  if (req.method !== 'POST') {\n    return res.status(405).json({\n      success: false,\n      error: { code: 'METHOD_NOT_ALLOWED', message: 'Use POST for render-4d operations' },\n    });\n  }\n\n  try {\n    const { operation, payload, context } = req.body as Render4DRequest;\n\n    const validOps = ['create-hypercube', 'rotate-4d', 'project-to-3d', 'color-map'];\n    if (!operation || !validOps.includes(operation)) {\n      return res.status(400).json({\n        success: false,\n        error: {\n          code: 'INVALID_OPERATION',\n          message: `Operation '${operation}' not supported. Use: ${validOps.join(', ')}`,\n        },\n      });\n    }\n\n    let result: Record<string, unknown>;\n\n    switch (operation) {\n      case 'create-hypercube':\n        result = createHypercube();\n        break;\n      case 'rotate-4d':\n        result = rotate4D(payload || {});\n        break;\n      case 'project-to-3d':\n        result = projectTo3D(payload || {});\n        break;\n      case 'color-map':\n        result = colorMap(payload || {});\n        break;\n      default:\n        throw new Error(`Unknown operation: ${operation}`);\n    }\n\n    const executionTime = performance.now() - startTime;\n\n    return res.status(200).json({\n      success: true,\n      data: result,\n      performance: { executionTime, startTime },\n      timestamp: new Date().toISOString(),\n      context: { userId: context?.userId, sessionId: context?.sessionId },\n    });\n  } catch (err) {\n    const executionTime = performance.now() - startTime;\n    const errorMessage = err instanceof Error ? err.message : 'Unknown error';\n\n    return res.status(500).json({\n      success: false,\n      error: {\n        code: 'RENDER_4D_ERROR',\n        message: errorMessage,\n      },\n      performance: { executionTime },\n      timestamp: new Date().toISOString(),\n    });\n  }\n}\n"
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+interface Render4DRequest {
+  operation: 'create-hypercube' | 'rotate-4d' | 'project-to-3d' | 'color-map';
+  payload: Record<string, unknown>;
+  context?: { userId?: string; sessionId?: string };
+}
+
+function hammingDistance(a: number, b: number): number {
+  let distance = 0;
+  let xor = a ^ b;
+  while (xor) {
+    distance += xor & 1;
+    xor >>= 1;
+  }
+  return distance;
+}
+
+function generateRotationMatrix(angle: number, plane: string = 'xy'): number[][] {
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+
+  const matrix: number[][] = [
+    [1, 0, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1],
+  ];
+
+  if (plane === 'xy' || plane === 'yx') {
+    matrix[0][0] = cos;
+    matrix[0][1] = -sin;
+    matrix[1][0] = sin;
+    matrix[1][1] = cos;
+  } else if (plane === 'zw' || plane === 'wz') {
+    matrix[2][2] = cos;
+    matrix[2][3] = -sin;
+    matrix[3][2] = sin;
+    matrix[3][3] = cos;
+  }
+
+  return matrix;
+}
+
+function frequencyToRGB(frequency: number): { r: number; g: number; b: number } {
+  const wavelength = 380 + (frequency % 321);
+  let r = 0;
+  let g = 0;
+  let b = 0;
+
+  if (wavelength >= 380 && wavelength < 440) {
+    r = Math.abs(wavelength - 440) / (440 - 380);
+    b = 1;
+  } else if (wavelength >= 440 && wavelength < 490) {
+    g = (wavelength - 440) / (490 - 440);
+    b = 1;
+  } else if (wavelength >= 490 && wavelength < 510) {
+    g = 1;
+    b = Math.abs(wavelength - 510) / (510 - 490);
+  } else if (wavelength >= 510 && wavelength < 580) {
+    r = (wavelength - 510) / (580 - 510);
+    g = 1;
+  } else if (wavelength >= 580 && wavelength < 645) {
+    r = 1;
+    g = Math.abs(wavelength - 645) / (645 - 580);
+  } else if (wavelength >= 645 && wavelength <= 700) {
+    r = 1;
+  }
+
+  return {
+    r: Math.floor(r * 255),
+    g: Math.floor(g * 255),
+    b: Math.floor(b * 255),
+  };
+}
+
+function createHypercube() {
+  const vertices: Array<{ id: number; x: number; y: number; z: number; w: number }> = [];
+  for (let i = 0; i < 16; i++) {
+    vertices.push({
+      id: i,
+      x: i & 1 ? 1 : -1,
+      y: i & 2 ? 1 : -1,
+      z: i & 4 ? 1 : -1,
+      w: i & 8 ? 1 : -1,
+    });
+  }
+
+  const edges: Array<{ from: number; to: number }> = [];
+  for (let i = 0; i < 16; i++) {
+    for (let j = i + 1; j < 16; j++) {
+      if (hammingDistance(i, j) === 1) {
+        edges.push({ from: i, to: j });
+      }
+    }
+  }
+
+  return {
+    type: 'hypercube-4d',
+    vertexCount: vertices.length,
+    edgeCount: edges.length,
+    vertices,
+    edges,
+    topology: {
+      cells_0d: 16, // vertices
+      cells_1d: 32, // edges
+      cells_2d: 24, // square faces
+      cells_3d: 8, // cubic cells
+      cells_4d: 1, // the hypercube itself
+    },
+  };
+}
+
+function rotate4D(payload: Record<string, unknown>) {
+  const angle = (payload as any).angle as number || 0.1;
+  const plane = (payload as any).plane as string || 'xy';
+
+  const rotationMatrix = generateRotationMatrix(angle, plane);
+
+  return {
+    status: 'rotated',
+    angle,
+    plane,
+    rotationMatrix,
+    rotationApplied: true,
+  };
+}
+
+function projectTo3D(payload: Record<string, unknown>) {
+  const method = (payload as any).method as string || 'schlegel';
+  const distance = (payload as any).distance as number || 2;
+
+  const projection = [
+    { x: 1, y: 1, z: 1 },
+    { x: -1, y: 1, z: 1 },
+    { x: 1, y: -1, z: 1 },
+    { x: -1, y: -1, z: 1 },
+    { x: 0.5, y: 0.5, z: 0.5 },
+    { x: -0.5, y: 0.5, z: 0.5 },
+    { x: 0.5, y: -0.5, z: 0.5 },
+    { x: -0.5, y: -0.5, z: 0.5 },
+  ];
+
+  return {
+    status: 'projected',
+    method,
+    projectionType: '3D',
+    distance,
+    vertices: projection,
+    vertexCount: projection.length,
+    metadata: {
+      preservesTopology: method === 'schlegel',
+      visibilityOptimized: true,
+      renderReady: true,
+    },
+  };
+}
+
+function colorMap(payload: Record<string, unknown>) {
+  const frequency = (payload as any).frequency as number || 440;
+  const colorScheme = (payload as any).colorScheme as string || 'spectrum';
+
+  const baseColor = frequencyToRGB(frequency);
+
+  return {
+    status: 'colored',
+    colorScheme,
+    baseColor: `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`,
+    gradient: [
+      frequencyToRGB(frequency - 50),
+      baseColor,
+      frequencyToRGB(frequency + 50),
+    ].map((c) => `rgb(${c.r}, ${c.g}, ${c.b})`),
+    frequency,
+  };
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const startTime = Date.now();
+
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('X-Cell-Type', 'Render4D');
+  res.setHeader('X-Cell-Version', '1.0.0');
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({
+      success: false,
+      error: { code: 'METHOD_NOT_ALLOWED', message: 'Use POST for render-4d operations' },
+    });
+  }
+
+  try {
+    const { operation, payload, context } = req.body as Render4DRequest;
+
+    const validOps = ['create-hypercube', 'rotate-4d', 'project-to-3d', 'color-map'] as const;
+    if (!operation || !validOps.includes(operation)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_OPERATION',
+          message: `Operation '${operation}' not supported. Use: ${validOps.join(', ')}`,
+        },
+      });
+    }
+
+    let result: Record<string, unknown>;
+
+    switch (operation) {
+      case 'create-hypercube':
+        result = createHypercube();
+        break;
+      case 'rotate-4d':
+        result = rotate4D(payload || {});
+        break;
+      case 'project-to-3d':
+        result = projectTo3D(payload || {});
+        break;
+      case 'color-map':
+        result = colorMap(payload || {});
+        break;
+      default:
+        throw new Error(`Unknown operation: ${operation}`);
+    }
+
+    const executionTime = Date.now() - startTime;
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+      performance: { executionTime, startTime },
+      timestamp: new Date().toISOString(),
+      context: { userId: context?.userId, sessionId: context?.sessionId },
+    });
+  } catch (err) {
+    const executionTime = Date.now() - startTime;
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+
+    return res.status(500).json({
+      success: false,
+      error: {
+        code: 'RENDER_4D_ERROR',
+        message: errorMessage,
+      },
+      performance: { executionTime },
+      timestamp: new Date().toISOString(),
+    });
+  }
+}
