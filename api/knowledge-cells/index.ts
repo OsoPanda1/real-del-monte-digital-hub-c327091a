@@ -1,1 +1,77 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';\n\ninterface KnowledgeCell {\n  id: string;\n  type: string;\n  description: string;\n  version: string;\n  endpoint: string;\n  status: 'active' | 'maintenance' | 'deprecated';\n}\n\nconst CELLS: Record<string, KnowledgeCell> = {\n  'render-3d-holocube-v1': {\n    id: 'render-3d-holocube-v1',\n    type: 'Render3D',\n    description: 'Renderizado holográfico de cubos volumétricos con efectos de luz e integración de audio XR',\n    version: '1.0.0',\n    endpoint: '/api/knowledge-cells/render-3d',\n    status: 'active',\n  },\n  'render-4d-hypercube-v1': {\n    id: 'render-4d-hypercube-v1',\n    type: 'Render4D',\n    description: 'Renderiza y manipula hipercubos 4D con proyecciones Schlegel interactivas',\n    version: '1.0.0',\n    endpoint: '/api/knowledge-cells/render-4d',\n    status: 'active',\n  },\n  'ia-immersivefx-v1': {\n    id: 'ia-immersivefx-v1',\n    type: 'IA-ImmersiveFX',\n    description: 'Efectos inmersivos generados por IA con mapeo multisensorial',\n    version: '1.0.0',\n    endpoint: '/api/knowledge-cells/ia-fx',\n    status: 'active',\n  },\n};\n\nexport default function handler(req: VercelRequest, res: VercelResponse) {\n  res.setHeader('Content-Type', 'application/json');\n  res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400');\n  res.setHeader('X-Knowledge-Cells-Version', '1.0.0');\n\n  if (req.method !== 'GET') {\n    return res.status(405).json({\n      success: false,\n      error: { code: 'METHOD_NOT_ALLOWED', message: 'Use GET to list knowledge cells' },\n    });\n  }\n\n  try {\n    const cells = Object.values(CELLS);\n    const active = cells.filter((c) => c.status === 'active');\n\n    return res.status(200).json({\n      success: true,\n      data: {\n        cells,\n        totalCount: cells.length,\n        activeCount: active.length,\n        timestamp: new Date().toISOString(),\n      },\n      meta: {\n        version: '1.0.0',\n        architecture: 'TAMV MD-X4 Microservices',\n        region: process.env.VERCEL_REGION || 'unknown',\n      },\n    });\n  } catch (err) {\n    const error = err instanceof Error ? err.message : 'Unknown error';\n    return res.status(500).json({\n      success: false,\n      error: { code: 'CELLS_LIST_ERROR', message: error },\n      timestamp: new Date().toISOString(),\n    });\n  }\n}\n"
+import { VercelRequest, VercelResponse } from '@vercel/node';
+
+interface KnowledgeCell {
+  id: string;
+  type: string;
+  description: string;
+  version: string;
+  endpoint: string;
+  status: 'active' | 'maintenance' | 'deprecated';
+}
+
+const CELLS: Record<string, KnowledgeCell> = {
+  'render-3d-holocube-v1': {
+    id: 'render-3d-holocube-v1',
+    type: 'Render3D',
+    description: 'Renderizado holográfico de cubos volumétricos con efectos de luz e integración de audio XR',
+    version: '1.0.0',
+    endpoint: '/api/knowledge-cells/render-3d',
+    status: 'active',
+  },
+  'render-4d-hypercube-v1': {
+    id: 'render-4d-hypercube-v1',
+    type: 'Render4D',
+    description: 'Renderiza y manipula hipercubos 4D con proyecciones Schlegel interactivas',
+    version: '1.0.0',
+    endpoint: '/api/knowledge-cells/render-4d',
+    status: 'active',
+  },
+  'ia-immersivefx-v1': {
+    id: 'ia-immersivefx-v1',
+    type: 'IA-ImmersiveFX',
+    description: 'Efectos inmersivos generados por IA con mapeo multisensorial',
+    version: '1.0.0',
+    endpoint: '/api/knowledge-cells/ia-fx',
+    status: 'active',
+  },
+};
+
+export default function handler(req: VercelRequest, res: VercelResponse) {
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400');
+  res.setHeader('X-Knowledge-Cells-Version', '1.0.0');
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({
+      success: false,
+      error: { code: 'METHOD_NOT_ALLOWED', message: 'Use GET to list knowledge cells' },
+    });
+  }
+
+  try {
+    const cells = Object.values(CELLS);
+    const active = cells.filter((c) => c.status === 'active');
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        cells,
+        totalCount: cells.length,
+        activeCount: active.length,
+        timestamp: new Date().toISOString(),
+      },
+      meta: {
+        version: '1.0.0',
+        architecture: 'TAMV MD-X4 Microservices',
+        region: process.env.VERCEL_REGION || 'unknown',
+      },
+    });
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    return res.status(500).json({
+      success: false,
+      error: { code: 'CELLS_LIST_ERROR', message: error },
+      timestamp: new Date().toISOString(),
+    });
+  }
+}
