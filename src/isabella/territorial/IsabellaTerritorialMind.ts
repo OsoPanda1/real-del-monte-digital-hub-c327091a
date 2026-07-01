@@ -42,7 +42,7 @@ export class IsabellaTerritorialMind {
 
   start(intervalMs = 60000): void {
     this.cycleInterval = setInterval(() => this.cycle(), intervalMs);
-    logger.info('[IsabellaTerritorialMind] Activada. Ciclo cada', intervalMs, 'ms');
+    logger.info('[IsabellaTerritorialMind] Activada', { intervalMs });
   }
 
   stop(): void {
@@ -164,8 +164,8 @@ export class IsabellaTerritorialMind {
     const routePayload = contribution.payload as unknown as Record<string, unknown>;
     if (routePayload.type !== 'route_trace' || !routePayload.waypoints) return null;
 
-    const distance = routePayload.distanceKm ?? 0;
-    const duration = routePayload.durationMinutes ?? 0;
+    const distance = Number(routePayload.distanceKm ?? 0);
+    const duration = Number(routePayload.durationMinutes ?? 0);
     const speed = duration > 0 ? (distance / duration) * 60 : 0;
 
     if (speed > 5) {

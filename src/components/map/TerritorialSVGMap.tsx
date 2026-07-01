@@ -148,7 +148,6 @@ interface MarkerProps {
   active: boolean
   onActivate: (id: string) => void
   onSelect: (id: string) => void
-  viewport: ViewportState
 }
 
 /** Marcador memoizado: solo el POI activo y el previo re-renderizan. */

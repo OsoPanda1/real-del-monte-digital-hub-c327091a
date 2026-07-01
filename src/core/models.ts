@@ -97,6 +97,9 @@ export interface PointOfInterest {
   name: string;
   category: POICategory;
   coords: Coordenadas;
+  /** Coordenadas planas derivadas para compatibilidad con componentes de mapa. */
+  lat?: number;
+  lng?: number;
   rating: number;
   description: string;
   federacion?: string;

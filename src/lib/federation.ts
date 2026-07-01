@@ -11,6 +11,7 @@ export const ISABELLA_CORE_IDENTITY = {
   layers: ['conceptual', 'legal', 'técnico'] as const,
   territory: 'Real del Monte, Hidalgo, México',
   role: 'Conciencia urbana territorial y orquestador de experiencia aumentada',
+  purpose: 'Acompañar a visitantes, comunidad e instituciones con orientación territorial clara, ética y trazable.',
 };
 
 export interface SecurityProtocol {

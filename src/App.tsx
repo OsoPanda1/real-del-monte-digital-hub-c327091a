@@ -16,7 +16,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react'
 import { Analytics } from '@vercel/analytics/react'
 
 // Componentes pesados: lazy loading para reducir bundle inicial (~126KB)
-const CinematicIntro = lazy(() => import('@/components/CinematicIntro'))
+const CinematicIntro = lazy(() => import('@/components/CinematicIntro').then((m) => ({ default: m.CinematicIntro })))
 const MicroPageIntro = lazy(() => import('@/components/MicroPageIntro'))
 const RealitoChatLauncher = lazy(() => import('./components/RealitoChatLauncher'))
 const AmbientLayer = lazy(() => import('@/components/AmbientLayer'))

@@ -34,7 +34,7 @@ export function IsabellaChat() {
     const allMessages = [...messages, userMsg];
 
     try {
-      const { supabase } = await import("@/lib/supabase");
+      const { supabase } = await import("@/integrations/supabase/client");
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token ?? import.meta.env.VITE_SUPABASE_ANON_KEY;
       const resp = await fetch(CHAT_URL, {
@@ -140,7 +140,7 @@ export function IsabellaChat() {
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => {
-                    if (voice.isSpeaking) { voice.stop(); return; }
+                    if (voice.isSpeaking) { voice.cancelAll(); return; }
                     const last = messages.filter((m) => m.role === "assistant").pop();
                     if (last) voice.speak(last.content);
                   }}

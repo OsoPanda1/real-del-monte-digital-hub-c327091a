@@ -90,7 +90,8 @@ export class IsabellaAwakeningProtocol {
       network: "TWITTER",
       type: "ANNOUNCEMENT",
       content: message,
-      mediaUrls: [],
+      mediaUrls: [] as string[],
+      retryCount: 0,
       targetAudience: "global",
     });
 

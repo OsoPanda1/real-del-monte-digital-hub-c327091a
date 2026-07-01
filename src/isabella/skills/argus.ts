@@ -132,7 +132,7 @@ class ArgusEngine {
     return recs;
   }
 
-  async getStats() {
+  getStats() {
     return { totalSimulations: this.callCount, historySize: this.simulationHistory.length, avgResponseMs: this.callCount > 0 ? Math.round(this.totalDurationMs / this.callCount) : 0 };
   }
 }

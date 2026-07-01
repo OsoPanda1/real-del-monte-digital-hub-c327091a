@@ -9,7 +9,8 @@ import { isabellaTerritorialMind } from '@/isabella/territorial/IsabellaTerritor
 import { federationBus } from '@/federaciones/FederationBus';
 import { isabellaGuardian } from '@/core/ai/isabella-guardian';
 import { locateNode } from '@/isabella/ontology';
-import type { SystemMetrics, Coordenadas } from '@/core/models';
+import type { Coordenadas, FederationId } from '@/core/models';
+import type { SystemMetrics } from '@/core/system/modes';
 import type {
   PipelineInput,
   PipelineResult,
@@ -50,7 +51,7 @@ export class IsabellaConsciousnessPipeline {
 
   constructor(config: Partial<PipelineConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
-    logger.info('[PIPELINE] Pipeline de Conciencia Hexagonal inicializado', this.config);
+    logger.info('[PIPELINE] Pipeline de Conciencia Hexagonal inicializado', { config: this.config });
   }
 
   registerInputPort(port: InputPort): void {
@@ -64,15 +65,10 @@ export class IsabellaConsciousnessPipeline {
   private getSystemMetrics(): SystemMetrics {
     const stats = isabellaTerritorialMind.getStats();
     return {
-      activeUsers: stats.activeUsers,
-      placesIndexed: stats.totalContributions,
-      kernelLatency: this.avgLatencyMs,
-      uptime: 0,
-      intentsProcessed: this.totalProcessed,
-      decisionsEmitted: 0,
-      sseConnections: 0,
-      geoLruSize: 0,
-      eventsDropped: 0,
+      cpuLoad: Math.min(1, this.totalProcessed / 1000),
+      errorRate: 0,
+      latencyP95: this.avgLatencyMs,
+      requestPerSecond: Math.max(0, stats.totalContributions / 60),
     };
   }
 
@@ -221,11 +217,14 @@ export class IsabellaConsciousnessPipeline {
       const metrics = this.getSystemMetrics();
       const decision = isabellaGuardian(metrics);
 
+      const primaryAction = decision.actions[0] ?? 'enable_cache_boost';
+      const severity = decision.mode.toLowerCase() as GuardianVerdict['severity'];
+
       guardian = {
-        action: decision.action,
-        severity: decision.severity,
-        federationsImpacted: this.getFederationsForAction(decision.action),
-        reason: decision.reason,
+        action: primaryAction,
+        severity,
+        federationsImpacted: this.getFederationsForAction(primaryAction),
+        reason: decision.reasoning,
       };
 
       // Apply guardian action: route to Federation Bus
@@ -233,9 +232,9 @@ export class IsabellaConsciousnessPipeline {
         federationActions.push({
           target: 'PHOENIX',
           eventType: 'GUARDIAN_ACTION',
-          payload: { action: decision.action, severity: decision.severity, metrics },
+          payload: { actions: decision.actions, primaryAction, severity, metrics },
           traceId,
-          priority: decision.severity === 'emergency' ? 'critical' : 'normal',
+          priority: severity === 'emergency' ? 'critical' : 'normal',
         });
       }
     }

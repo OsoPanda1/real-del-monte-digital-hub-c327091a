@@ -1,31 +1,32 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
 
-jest.mock('@/integrations/supabase/client', () => ({
+vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     auth: {
       onAuthStateChange: (callback: (event: string, session: Session | null) => void) => ({
-        data: { subscription: { unsubscribe: jest.fn() } },
+        data: { subscription: { unsubscribe: vi.fn() } },
       }),
-      getSession: jest.fn(),
+      getSession: vi.fn(),
     },
   },
 }));
 
 describe('useAuth', () => {
-  const mockUnsubscribe = jest.fn();
+  const mockUnsubscribe = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (supabase.auth.onAuthStateChange as jest.Mock).mockImplementation((callback) => ({
+    vi.clearAllMocks();
+    (supabase.auth.onAuthStateChange as Mock).mockImplementation((callback) => ({
       data: { subscription: { unsubscribe: mockUnsubscribe } },
     }));
   });
 
   it('should return initial loading state', () => {
-    (supabase.auth.getSession as jest.Mock).mockResolvedValueOnce({ data: { session: null }, error: null });
+    (supabase.auth.getSession as Mock).mockResolvedValueOnce({ data: { session: null }, error: null });
 
     const { result } = renderHook(() => useAuth());
 
@@ -43,10 +44,10 @@ describe('useAuth', () => {
       user: { id: 'user123', email: 'test@example.com' } as User,
       expires_at: Date.now() / 1000 + 3600,
     };
-    (supabase.auth.getSession as jest.Mock).mockResolvedValueOnce({ data: { session: mockSession }, error: null });
+    (supabase.auth.getSession as Mock).mockResolvedValueOnce({ data: { session: mockSession }, error: null });
 
-    const { result, waitForNextUpdate } = renderHook(() => useAuth());
-    await waitForNextUpdate(); // espera al próximo render después del getting session
+    const { result } = renderHook(() => useAuth());
+    await waitFor(() => expect(result.current.loading).toBe(false));
 
     expect(result.current.loading).toBe(false);
     expect(result.current.session).toEqual(mockSession);
@@ -54,7 +55,7 @@ describe('useAuth', () => {
   });
 
   it('should clean up subscription on unmount', () => {
-    (supabase.auth.getSession as jest.Mock).mockResolvedValueOnce({ data: { session: null }, error: null });
+    (supabase.auth.getSession as Mock).mockResolvedValueOnce({ data: { session: null }, error: null });
 
     const { unmount } = renderHook(() => useAuth());
     unmount();

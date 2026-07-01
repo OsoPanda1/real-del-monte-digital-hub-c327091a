@@ -93,7 +93,7 @@ const MetaverseHome: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* Matrix 3D Background */}
-      <Matrix3DEffect showHero={false} />
+      <Matrix3DEffect />
 
       {/* 4 Retractable Toolbars */}
       <RetractableToolbar position="top" items={topBarItems} notificationType={activeNotification as any} />

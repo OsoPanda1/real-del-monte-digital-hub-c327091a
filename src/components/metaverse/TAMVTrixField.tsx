@@ -173,7 +173,6 @@ const TAMVTrixField: React.FC<TAMVTrixFieldProps> = ({
       animationId = requestAnimationFrame(draw);
     };
 
-    let animationId: number;
     initColumns();
     window.addEventListener("resize", initColumns);
     animationId = requestAnimationFrame(draw);

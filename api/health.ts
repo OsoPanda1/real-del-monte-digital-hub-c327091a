@@ -1,1 +1,97 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';\n\ninterface HealthStatus {\n  status: 'healthy' | 'degraded' | 'critical';\n  timestamp: string;\n  uptime: number;\n  region: string;\n  cells: Array<{ id: string; endpoint: string; status: string; latency: number }>;\n  federations: Array<{ name: string; status: string }>;\n}\n\nexport default async function handler(req: VercelRequest, res: VercelResponse) {\n  const startTime = performance.now();\n\n  res.setHeader('Content-Type', 'application/json');\n  res.setHeader('Cache-Control', 'no-cache, max-age=60');\n\n  try {\n    const healthStatus: HealthStatus = {\n      status: 'healthy',\n      timestamp: new Date().toISOString(),\n      uptime: process.uptime?.() || 0,\n      region: process.env.VERCEL_REGION || 'unknown',\n      cells: [\n        {\n          id: 'render-3d-holocube-v1',\n          endpoint: '/api/knowledge-cells/render-3d',\n          status: 'active',\n          latency: Math.random() * 50 + 10,\n        },\n        {\n          id: 'render-4d-hypercube-v1',\n          endpoint: '/api/knowledge-cells/render-4d',\n          status: 'active',\n          latency: Math.random() * 50 + 15,\n        },\n        {\n          id: 'ia-immersivefx-v1',\n          endpoint: '/api/knowledge-cells/ia-fx',\n          status: 'active',\n          latency: Math.random() * 50 + 20,\n        },\n      ],\n      federations: [\n        { name: 'F1 - Gobernanza', status: 'operational' },\n        { name: 'F2 - Identidad y Acceso', status: 'operational' },\n        { name: 'F3 - Datos Territoriales', status: 'operational' },\n        { name: 'F4 - Comercio y Monetización', status: 'operational' },\n        { name: 'F5 - IA Cognitiva', status: 'operational' },\n        { name: 'F6 - Comunidad y Contenido', status: 'operational' },\n        { name: 'F7 - Observabilidad y Seguridad', status: 'operational' },\n      ],\n    };\n\n    const avgCellLatency =\n      healthStatus.cells.reduce((sum, c) => sum + c.latency, 0) / healthStatus.cells.length;\n    const criticalLatency = avgCellLatency > 200;\n    const degraded = avgCellLatency > 100 || healthStatus.federations.some((f) => f.status !== 'operational');\n\n    if (criticalLatency) {\n      healthStatus.status = 'critical';\n    } else if (degraded) {\n      healthStatus.status = 'degraded';\n    }\n\n    const executionTime = performance.now() - startTime;\n\n    return res.status(healthStatus.status === 'critical' ? 503 : 200).json({\n      success: true,\n      data: healthStatus,\n      performance: { executionTime },\n      buildTime: process.env.VERCEL_BUILD_COMPLETED_AT || 'unknown',\n    });\n  } catch (err) {\n    const executionTime = performance.now() - startTime;\n    const errorMessage = err instanceof Error ? err.message : 'Unknown error';\n\n    return res.status(500).json({\n      success: false,\n      status: 'critical',\n      error: {\n        code: 'HEALTH_CHECK_FAILED',\n        message: errorMessage,\n      },\n      performance: { executionTime },\n      timestamp: new Date().toISOString(),\n    });\n  }\n}\n"
+interface VercelRequest {
+  method?: string;
+}
+
+interface VercelResponse {
+  setHeader(name: string, value: string): void;
+  status(code: number): VercelResponse;
+  json(body: unknown): void;
+}
+
+interface HealthStatus {
+  status: 'healthy' | 'degraded' | 'critical';
+  timestamp: string;
+  uptime: number;
+  region: string;
+  cells: Array<{ id: string; endpoint: string; status: string; latency: number }>;
+  federations: Array<{ name: string; status: string }>;
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const startTime = performance.now();
+
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Cache-Control', 'no-cache, max-age=60');
+
+  try {
+    const healthStatus: HealthStatus = {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime?.() || 0,
+      region: process.env.VERCEL_REGION || 'unknown',
+      cells: [
+        {
+          id: 'render-3d-holocube-v1',
+          endpoint: '/api/knowledge-cells/render-3d',
+          status: 'active',
+          latency: Math.random() * 50 + 10,
+        },
+        {
+          id: 'render-4d-hypercube-v1',
+          endpoint: '/api/knowledge-cells/render-4d',
+          status: 'active',
+          latency: Math.random() * 50 + 15,
+        },
+        {
+          id: 'ia-immersivefx-v1',
+          endpoint: '/api/knowledge-cells/ia-fx',
+          status: 'active',
+          latency: Math.random() * 50 + 20,
+        },
+      ],
+      federations: [
+        { name: 'F1 - Gobernanza', status: 'operational' },
+        { name: 'F2 - Identidad y Acceso', status: 'operational' },
+        { name: 'F3 - Datos Territoriales', status: 'operational' },
+        { name: 'F4 - Comercio y Monetización', status: 'operational' },
+        { name: 'F5 - IA Cognitiva', status: 'operational' },
+        { name: 'F6 - Comunidad y Contenido', status: 'operational' },
+        { name: 'F7 - Observabilidad y Seguridad', status: 'operational' },
+      ],
+    };
+
+    const avgCellLatency =
+      healthStatus.cells.reduce((sum, c) => sum + c.latency, 0) / healthStatus.cells.length;
+    const criticalLatency = avgCellLatency > 200;
+    const degraded = avgCellLatency > 100 || healthStatus.federations.some((f) => f.status !== 'operational');
+
+    if (criticalLatency) {
+      healthStatus.status = 'critical';
+    } else if (degraded) {
+      healthStatus.status = 'degraded';
+    }
+
+    const executionTime = performance.now() - startTime;
+
+    return res.status(healthStatus.status === 'critical' ? 503 : 200).json({
+      success: true,
+      data: healthStatus,
+      performance: { executionTime },
+      buildTime: process.env.VERCEL_BUILD_COMPLETED_AT || 'unknown',
+    });
+  } catch (err) {
+    const executionTime = performance.now() - startTime;
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+
+    return res.status(500).json({
+      success: false,
+      status: 'critical',
+      error: {
+        code: 'HEALTH_CHECK_FAILED',
+        message: errorMessage,
+      },
+      performance: { executionTime },
+      timestamp: new Date().toISOString(),
+    });
+  }
+}

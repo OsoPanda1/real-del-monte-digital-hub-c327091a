@@ -63,7 +63,7 @@ export async function locateNode(
     .eq("parent_node_id", mapped.nodeId);
 
   const { data: ancestors } = await supabase
-    .rpc("get_ontology_ancestors", { node_uuid: mapped.nodeId });
+    .rpc("get_ontology_ancestors" as never, { node_uuid: mapped.nodeId } as never);
 
   return {
     node: mapped,
@@ -75,15 +75,20 @@ export async function locateNode(
 }
 
 function mapRow(row: Record<string, unknown>): OntologyNode {
+  const semanticRules =
+    typeof row.semantic_rules === "object" && row.semantic_rules !== null
+      ? (row.semantic_rules as OntologyNode["semanticRules"])
+      : { allowExternalInference: false };
+
   return {
-    nodeId: row.node_id,
-    parentNodeId: row.parent_node_id,
-    federationId: row.federation_id,
-    themeId: row.theme_id,
-    nodeName: row.node_name,
-    chromaticHex: row.chromatic_hex,
-    abstractionLevel: row.abstraction_level,
-    semanticRules: row.semantic_rules,
-    createdAt: row.created_at,
+    nodeId: String(row.node_id),
+    parentNodeId: row.parent_node_id === null ? null : String(row.parent_node_id),
+    federationId: Number(row.federation_id) as OntologyNode["federationId"],
+    themeId: Number(row.theme_id) as OntologyNode["themeId"],
+    nodeName: String(row.node_name),
+    chromaticHex: String(row.chromatic_hex),
+    abstractionLevel: Number(row.abstraction_level) as OntologyNode["abstractionLevel"],
+    semanticRules,
+    createdAt: String(row.created_at),
   };
 }
